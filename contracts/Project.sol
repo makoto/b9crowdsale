@@ -1,6 +1,13 @@
 pragma solidity ^0.4.2;
 
 contract Project {
+
+  struct Detail{
+    address owner;
+    uint targetAmount;
+    uint deadline;
+  }
+
   function Project() {
     // constructor
   }
