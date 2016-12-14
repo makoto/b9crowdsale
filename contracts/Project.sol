@@ -5,8 +5,7 @@ contract Project {
 
   struct Detail{
     address owner;
-    string title;
-    string description;
+    bytes32 title;
     uint targetAmount;
     uint deadline;
   }
@@ -16,9 +15,8 @@ contract Project {
     uint amount;
   }
 
-  /*function Project(string _title, string _description, uint _targetAmount, uint _deadline) {*/
-  function Project() {
-    detail = Detail(msg.sender, 'title', 'desription', 1,1);
+  function Project(bytes32 _title, uint _targetAmount, uint _deadline) {
+    detail = Detail(msg.sender, _title, _targetAmount, _deadline);
   }
 
   function fund(){}

@@ -15,24 +15,19 @@ contract('Project', function(accounts) {
       var project;
       var owner = accounts[0];
       var title = 'My pet project';
-      var description = 'Very nice project';
       var targetAmount = web3.toWei(100);
       var a_day = 1 * 60 * 60 * 24 // 1 day
       var deadline = a_day * 8;
-      Project.new({from:owner})
+      Project.new(title, targetAmount, deadline, {from:owner})
       .then(function(_project) {
         project = _project;
         return project.detail.call()
       })
       .then(function(detail) {
         assert.equal(detail[0], owner);
-        //  {
-        //   address:owner,
-        //   title:title,
-        //   description:description,
-        //   targetAmount:targetAmount,
-        //   deadline:deadline
-        // })
+        assert.equal(web3.toUtf8(detail[1]), title);
+        assert.equal(detail[2], targetAmount);
+        assert.equal(detail[3], deadline);
       })
       .then(done);
     })
