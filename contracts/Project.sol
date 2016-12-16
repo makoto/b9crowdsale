@@ -14,6 +14,7 @@ contract Project is PullPayment, Ownable{
 
   struct Contributor{
     uint amount;
+    bool paid;
   }
 
   mapping(address => Contributor) public contributors;
@@ -26,7 +27,7 @@ contract Project is PullPayment, Ownable{
 
   function fund() payable{
     if(msg.value <= 0) throw;
-    contributors[msg.sender] = Contributor(msg.value);
+    contributors[msg.sender] = Contributor(msg.value, false);
   }
 
   /*
@@ -44,6 +45,13 @@ contract Project is PullPayment, Ownable{
   function refund(){
     if(this.balance >= detail.targetAmount) throw;
     var contributor = contributors[msg.sender];
-    if(!msg.sender.send(contributor.amount)) throw ;
+    if(contributor.amount == 0) throw;
+
+    if (contributor.paid == false){
+      contributor.paid = true;
+      if(!msg.sender.send(contributor.amount)) {
+        throw;
+      }
+    }
   }
 }
