@@ -23,6 +23,7 @@ contract Project {
   }
 
   function fund() payable{
+    if(msg.value <= 0) throw;
     contributors[msg.sender] = Contributor(msg.value);
   }
 

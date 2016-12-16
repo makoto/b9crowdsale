@@ -11,16 +11,6 @@ contract('Project', function(accounts) {
   var deadline = a_day * 8;
   var invalid_jump_error = 'Error: VM Exception while processing transaction: invalid JUMP';
 
-  /*
-    This is the function called when the FundingHub receives a contribution.
-    The function must keep track of the contributor and the individual amount contributed.
-    If the contribution was sent after the deadline of the project passed,
-    or the full amount has been reached,
-    the function must return the value to the originator of the transaction and
-    call one of two functions.
-    If the full funding amount has been reached, the function must call payout.
-    If the deadline has passed without the funding goal being reached, the function must call refund.
-  */
   describe('constructor', function(){
     it('creates new project', function(done){
       Project.new(title, targetAmount, deadline, {from:owner})
@@ -36,6 +26,7 @@ contract('Project', function(accounts) {
       })
       .then(done);
     })
+
     it('does not allow zero deadline', function(done){
       Project.new(title, targetAmount, 0, {from:owner})
       .catch(function(error){
@@ -73,7 +64,17 @@ contract('Project', function(accounts) {
       .then(done);
     })
 
-    it('does not allow zero contribution')
+    it('does not allow zero contribution', function(done){
+      Project.new(title, targetAmount, deadline, {from:owner})
+      .then(function(_project) {
+        project = _project;
+        return project.fund.sendTransaction({from:backer, value:0});
+      })
+      .catch(function(error){
+        assert.strictEqual(error.toString(), invalid_jump_error);
+      })
+      .then(done);
+    })
   })
 
   describe('payout', function(){
