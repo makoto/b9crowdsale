@@ -80,7 +80,7 @@ contract('Project', function(accounts) {
   })
 
   describe('payout', function(){
-    it.only('payouts if the full funding amount has been reached', function(done){
+    it('payouts if the full funding amount has been reached', function(done){
       targetAmount = contribution * 2;
       Project.new(title, targetAmount, deadline, {from:owner})
       .then(function(_project) {
@@ -105,6 +105,24 @@ contract('Project', function(accounts) {
         // The above assertion is not successful, hence compromising the test to simply
         // check that the owner gets more money than before.
         assert(web3.eth.getBalance(owner).toNumber() > previousBalance.toNumber());
+      })
+      .then(done);
+    })
+
+    it('does not payout if the full funding amount has not been reached', function(done){
+      targetAmount = contribution * 2;
+      Project.new(title, targetAmount, deadline, {from:owner})
+      .then(function(_project) {
+        project = _project;
+        return project.fund.sendTransaction({from:backer, value:contribution});
+      })
+      .then(function() {
+        previousBalance = web3.eth.getBalance(owner);
+        return project.payout.sendTransaction({from:another_backer});
+      })
+      .catch(function(error){
+        assert.strictEqual(error.toString(), invalid_jump_error);
+        assert.strictEqual(web3.eth.getBalance(project.address).toString(), contribution);
       })
       .then(done);
     })

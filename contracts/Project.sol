@@ -33,6 +33,7 @@ contract Project is PullPayment, Ownable{
     This is the function that sends all funds received in the contract to the owner of the project.
   */
   function payout(){
+    if(this.balance < detail.targetAmount) throw;
     asyncSend(owner, this.balance);
   }
 
