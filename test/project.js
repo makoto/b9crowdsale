@@ -9,6 +9,7 @@ contract('Project', function(accounts) {
   var contribution = web3.toWei(1);
   var a_day = 1 * 60 * 60 * 24 // 1 day
   var deadline = a_day * 8;
+  var invalid_jump_error = 'Error: VM Exception while processing transaction: invalid JUMP';
 
   /*
     This is the function called when the FundingHub receives a contribution.
@@ -28,17 +29,18 @@ contract('Project', function(accounts) {
         return project.detail.call()
       })
       .then(function(detail) {
-        assert.equal(detail[0], owner);
-        assert.equal(web3.toUtf8(detail[1]), title);
-        assert.equal(detail[2], targetAmount);
-        assert.equal(detail[3], deadline);
+        assert.strictEqual(detail[0], owner);
+        assert.strictEqual(web3.toUtf8(detail[1]), title);
+        assert.strictEqual(detail[2].toString(), targetAmount);
+        assert.strictEqual(detail[3].toNumber(), deadline);
       })
       .then(done);
     })
     it('does not allow zero deadline', function(done){
       Project.new(title, targetAmount, 0, {from:owner})
       .catch(function(error){
-        assert.equal(error, 'Error: VM Exception while processing transaction: invalid JUMP');
+        console.log('error', error.toString(), Object.prototype.toString(error))
+        assert.strictEqual(error.toString(), invalid_jump_error);
       })
       .then(done);
     })
@@ -46,7 +48,7 @@ contract('Project', function(accounts) {
     it('does not allow empty or minus target', function(done){
       Project.new(title, 0, deadline, {from:owner})
       .catch(function(error){
-        assert.equal(error, 'Error: VM Exception while processing transaction: invalid JUMP');
+        assert.strictEqual(error.toString(), invalid_jump_error);
       })
       .then(done);
     })
@@ -62,11 +64,11 @@ contract('Project', function(accounts) {
         return project.fund.sendTransaction({from:backer, value:contribution});
       })
       .then(function() {
-        assert.equal(web3.eth.getBalance(project.address).toString(), contribution.toString());
+        assert.strictEqual(web3.eth.getBalance(project.address).toString(), contribution.toString());
         return project.contributors.call(backer);
       })
       .then(function(contributor) {
-        assert.equal(contributor.toString(), contribution);
+        assert.strictEqual(contributor.toString(), contribution);
       })
       .then(done);
     })
