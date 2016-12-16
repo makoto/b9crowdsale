@@ -1,4 +1,14 @@
+'use strict';
+
 contract('Project', function(accounts) {
+  var project;
+  var owner = accounts[0];
+  var backer = accounts[1];
+  var title = 'My pet project';
+  var targetAmount = web3.toWei(10);
+  var contribution = web3.toWei(1);
+  var a_day = 1 * 60 * 60 * 24 // 1 day
+  var deadline = a_day * 8;
 
   /*
     This is the function called when the FundingHub receives a contribution.
@@ -11,15 +21,6 @@ contract('Project', function(accounts) {
     If the deadline has passed without the funding goal being reached, the function must call refund.
   */
   describe('constructor', function(){
-    var project;
-    var owner = accounts[0];
-    var backer = accounts[1];
-    var title = 'My pet project';
-    var targetAmount = web3.toWei(10);
-    var contribution = web3.toWei(1);
-    var a_day = 1 * 60 * 60 * 24 // 1 day
-    var deadline = a_day * 8;
-
     it('creates new project', function(done){
       Project.new(title, targetAmount, deadline, {from:owner})
       .then(function(_project) {
@@ -34,8 +35,21 @@ contract('Project', function(accounts) {
       })
       .then(done);
     })
-    it('does not allow minus deadline')
-    it('does not allow minus target')
+    it('does not allow zero deadline', function(done){
+      Project.new(title, targetAmount, 0, {from:owner})
+      .catch(function(error){
+        assert.equal(error, 'Error: VM Exception while processing transaction: invalid JUMP');
+      })
+      .then(done);
+    })
+
+    it('does not allow empty or minus target', function(done){
+      Project.new(title, 0, deadline, {from:owner})
+      .catch(function(error){
+        assert.equal(error, 'Error: VM Exception while processing transaction: invalid JUMP');
+      })
+      .then(done);
+    })
     it('allows duplicate title')  // just for documentation purpose
     it('allows empty title')      // just for documentation purpose
   })
@@ -45,17 +59,19 @@ contract('Project', function(accounts) {
       Project.new(title, targetAmount, deadline, {from:owner})
       .then(function(_project) {
         project = _project;
-        return project.fund.sendTransaction({from:backer, amount:contribution})
+        return project.fund.sendTransaction({from:backer, value:contribution});
       })
       .then(function() {
-        return project.contributor.call(backer)
+        assert.equal(web3.eth.getBalance(project.address).toString(), contribution.toString());
+        return project.contributors.call(backer);
       })
       .then(function(contributor) {
-        assert.equal(contributor[0], backer);
-        assert.equal(contributor[0], contribution);
+        assert.equal(contributor.toString(), contribution);
       })
       .then(done);
     })
+
+    it('does not allow zero contribution')
   })
 
   describe('payout', function(){
@@ -63,8 +79,6 @@ contract('Project', function(accounts) {
   })
 
   describe('refund', function(){
-    it("refunds the fund to the contributor if funding goal has not been reached", function(done) {
-
-    });
+    it("refunds the fund to the contributor if funding goal has not been reached")
   })
 });

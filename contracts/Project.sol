@@ -11,15 +11,20 @@ contract Project {
   }
 
   struct Contributor{
-    address contributorAddress;
     uint amount;
   }
 
+  mapping(address => Contributor) public contributors;
+
   function Project(bytes32 _title, uint _targetAmount, uint _deadline) {
+    if(_deadline <= 0) throw;
+    if(_targetAmount <= 0) throw;
     detail = Detail(msg.sender, _title, _targetAmount, _deadline);
   }
 
-  function fund(){}
+  function fund() payable{
+    contributors[msg.sender] = Contributor(msg.value);
+  }
 
   /*
     This is the function that sends all funds received in the contract to the owner of the project.
