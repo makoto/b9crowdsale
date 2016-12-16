@@ -32,7 +32,6 @@ contract('Project', function(accounts) {
     it('does not allow zero deadline', function(done){
       Project.new(title, targetAmount, 0, {from:owner})
       .catch(function(error){
-        console.log('error', error.toString(), Object.prototype.toString(error))
         assert.strictEqual(error.toString(), invalid_jump_error);
       })
       .then(done);
@@ -57,11 +56,14 @@ contract('Project', function(accounts) {
         return project.fund.sendTransaction({from:backer, value:contribution});
       })
       .then(function() {
-        assert.strictEqual(web3.eth.getBalance(project.address).toString(), contribution.toString());
+        return project.fund.sendTransaction({from:backer, value:contribution});
+      })
+      .then(function() {
+        assert.strictEqual(web3.eth.getBalance(project.address).toString(), (contribution * 2).toString());
         return project.contributors.call(backer);
       })
       .then(function(contributor) {
-        assert.strictEqual(contributor[0].toString(), contribution);
+        assert.strictEqual(contributor[0].toString(), (contribution * 2).toString());
         assert.strictEqual(contributor[1], false);
       })
       .then(done);

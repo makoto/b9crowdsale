@@ -27,7 +27,11 @@ contract Project is PullPayment, Ownable{
 
   function fund() payable{
     if(msg.value <= 0) throw;
-    contributors[msg.sender] = Contributor(msg.value, false);
+    if(contributors[msg.sender].amount != 0){
+      contributors[msg.sender].amount += contributors[msg.sender].amount;
+    }else{
+      contributors[msg.sender] = Contributor(msg.value, false);
+    }
   }
 
   /*
