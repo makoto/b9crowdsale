@@ -126,9 +126,48 @@ contract('Project', function(accounts) {
       })
       .then(done);
     })
+
+    it("does not payout if deadline is not passed")
   })
 
   describe('refund', function(){
-    it("refunds the fund to the contributor if funding goal has not been reached")
+    it("refunds the fund to the contributor if funding goal has not been reached", function(done){
+      targetAmount = contribution * 2;
+      Project.new(title, targetAmount, deadline, {from:owner})
+      .then(function(_project) {
+        project = _project;
+        return project.fund.sendTransaction({from:backer, value:contribution});
+      })
+      .then(function() {
+        previousBalance = web3.eth.getBalance(backer);
+        return project.refund.sendTransaction({from:backer});
+      })
+      .then(function() {
+        assert.strictEqual(web3.eth.getBalance(project.address).toString(), '0');
+        assert(web3.eth.getBalance(backer).toNumber() > previousBalance.toNumber());
+      })
+      .then(done);
+    })
+
+    it.only("does not refund the fund to the contributor if funding has been reached", function(done){
+      targetAmount = contribution * 1;
+      Project.new(title, targetAmount, deadline, {from:owner})
+      .then(function(_project) {
+        project = _project;
+        return project.fund.sendTransaction({from:backer, value:contribution});
+      })
+      .then(function() {
+        previousBalance = web3.eth.getBalance(owner);
+        return project.refund.sendTransaction({from:another_backer});
+      })
+      .catch(function(error){
+        assert.strictEqual(error.toString(), invalid_jump_error);
+        assert.strictEqual(web3.eth.getBalance(project.address).toString(), contribution);
+      })
+      .then(done);
+    })
+
+    it("does not refund the fund to the contributor if already refunded")
+    it("does not refund the fund to the contributor if deadline is not passed")
   })
 });

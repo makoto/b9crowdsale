@@ -41,5 +41,9 @@ contract Project is PullPayment, Ownable{
     This function sends all individual contributions back to the respective contributor,
     or lets all contributors retrieve their contributions.
   */
-  function refund(){}
+  function refund(){
+    if(this.balance >= detail.targetAmount) throw;
+    var contributor = contributors[msg.sender];
+    if(!msg.sender.send(contributor.amount)) throw ;
+  }
 }
