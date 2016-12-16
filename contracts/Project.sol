@@ -1,6 +1,8 @@
 pragma solidity ^0.4.2;
+import 'zeppelin/PullPayment.sol';
+import 'zeppelin/Ownable.sol';
 
-contract Project {
+contract Project is PullPayment, Ownable{
   Detail public detail;
 
   struct Detail{
@@ -30,7 +32,9 @@ contract Project {
   /*
     This is the function that sends all funds received in the contract to the owner of the project.
   */
-  function payout(){}
+  function payout(){
+    asyncSend(owner, this.balance);
+  }
 
   /*
     This function sends all individual contributions back to the respective contributor,
