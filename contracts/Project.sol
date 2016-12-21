@@ -35,7 +35,7 @@ contract Project is PullPayment, Ownable{
     if(isComplete()){
       if(!msg.sender.send(amount)) throw;
 
-      if(isSuccess() && this.balance > 0){
+      if(isSuccess()){
         payout();
       }else{
         if(contributors[msg.sender].amount != 0){
@@ -53,9 +53,8 @@ contract Project is PullPayment, Ownable{
       }else{
         contributors[msg.sender] = Contributor(msg.value, false);
       }
-      if(isSuccess() && this.balance > 0){
-        payout();
-      }
+
+      if(isSuccess()) payout();
     }
   }
 
@@ -73,10 +72,10 @@ contract Project is PullPayment, Ownable{
 
   /*
     This is the function that sends all funds received in the contract to the owner of the project.
+    Will be called by fund().
   */
-  function payout() public{
-    if(!isSuccess()) throw;
-    asyncSend(owner, this.balance);
+  function payout() private{
+    if(this.balance > 0) asyncSend(owner, this.balance);
   }
 
   /*
