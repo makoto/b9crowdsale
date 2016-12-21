@@ -26,25 +26,67 @@ contract Project is PullPayment, Ownable{
     detail = Detail(msg.sender, _title, _targetAmount, _deadline);
   }
 
-  function fund() public payable{
+  event EventLog(string message);
+  event EventLog2(string message, uint one, uint two, uint three, uint four);
+
+  function fund() payable{
+    EventLog('FUND');
     if(msg.value <= 0) throw;
-    if(contributors[msg.sender].amount != 0){
-      contributors[msg.sender].amount += contributors[msg.sender].amount;
+    var amount = msg.value;
+
+    if(isComplete()){
+      if(!msg.sender.send(amount)) throw;
+
+      EventLog('isComplete');
+      if(isSuccess() && this.balance > 0){
+        EventLog('success');
+        payout();
+      }else{
+        EventLog('failed');
+        if(contributors[msg.sender].amount != 0){
+          refund();
+        }
+      }
     }else{
-      contributors[msg.sender] = Contributor(msg.value, false);
+      EventLog('NOT isComplete');
+      EventLog2('hello', this.balance, amount, this.balance + amount, detail.targetAmount);
+      if(this.balance > detail.targetAmount){
+        var diff = this.balance - detail.targetAmount;
+        amount = amount - diff;
+        EventLog('Returning diff');
+        if(!msg.sender.send(diff)) throw;
+      }
+      if(contributors[msg.sender].amount != 0){
+        contributors[msg.sender].amount += contributors[msg.sender].amount;
+      }else{
+        contributors[msg.sender] = Contributor(msg.value, false);
+      }
+      if(isSuccess() && this.balance > 0){
+        EventLog('success');
+        payout();
+      }else{
+        EventLog('still going on');
+      }
     }
   }
 
-  modifier auctionEnded{
-    if(now < endDate) throw;
-    _;
+  function isComplete() constant returns(bool){
+    return now > endDate;
+  }
+
+  function isSuccess() constant returns(bool){
+    return this.balance == detail.targetAmount;
+  }
+
+  function isFailure() constant returns(bool){
+    return isComplete() && (this.balance < detail.targetAmount);
   }
 
   /*
     This is the function that sends all funds received in the contract to the owner of the project.
   */
-  function payout() public auctionEnded{
-    if(this.balance < detail.targetAmount) throw;
+  function payout() public{
+    if(!isSuccess()) throw;
     asyncSend(owner, this.balance);
   }
 
@@ -52,8 +94,9 @@ contract Project is PullPayment, Ownable{
     This function sends all individual contributions back to the respective contributor,
     or lets all contributors retrieve their contributions.
   */
-  function refund() public auctionEnded {
-    if(this.balance >= detail.targetAmount) throw;
+  function refund() public{
+    if(!isFailure()) throw;
+
     var contributor = contributors[msg.sender];
     if(contributor.amount == 0) throw;
 

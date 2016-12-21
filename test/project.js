@@ -2,18 +2,17 @@
 
 contract('Project', function(accounts) {
   var Tempo = require('@digix/tempo').default
-  var tempo;
-  var project;
+  var tempo, project;
   var owner = accounts[0];
   var backer = accounts[1];
   var another_backer = accounts[2];
   var title = 'My pet project';
-  var targetAmount = web3.toWei(10);
-  var contribution = web3.toWei(1);
+  var targetAmount = parseInt(web3.toWei(10));
+  var contribution = parseInt(web3.toWei(1));
   var a_day = 1 * 60 * 60 * 24 // 1 day
   var deadline = a_day * 8;
   var invalid_jump_error = 'Error: VM Exception while processing transaction: invalid JUMP';
-  var previousBalance;
+  var previousBalance, previousOwnerBalance;
 
   describe('constructor', function(){
     it('creates new project', function(done){
@@ -25,7 +24,7 @@ contract('Project', function(accounts) {
       .then(function(detail) {
         assert.strictEqual(detail[0], owner);
         assert.strictEqual(web3.toUtf8(detail[1]), title);
-        assert.strictEqual(detail[2].toString(), targetAmount);
+        assert.strictEqual(detail[2].toNumber(), targetAmount);
         assert.strictEqual(detail[3].toNumber(), deadline);
       })
       .then(done);
@@ -82,10 +81,8 @@ contract('Project', function(accounts) {
       })
       .then(done);
     })
-  })
 
-  describe('payout', function(){
-    it('payouts if the full funding amount has been reached', function(done){
+    it('payouts if the full funding amount has been reached prior to deadline', function(done){
       targetAmount = contribution * 2;
       new Tempo(web3).then(function(_tempo){
         tempo = _tempo;
@@ -97,12 +94,6 @@ contract('Project', function(accounts) {
       })
       .then(function() {
         return project.fund.sendTransaction({from:another_backer, value:contribution});
-      })
-      .then(function() {
-        return tempo.waitForBlocks(1, deadline + a_day);
-      })
-      .then(function() {
-        return project.payout.sendTransaction({from:another_backer});
       })
       .then(function() {
         previousBalance = web3.eth.getBalance(owner);
@@ -120,7 +111,33 @@ contract('Project', function(accounts) {
       .then(done);
     })
 
-    it('does not payout if the full funding amount has not been reached', function(done){
+    it('returns the diff if fund exceeds target', function(done){
+      targetAmount = parseInt(contribution) * 1.5;
+      var diff = targetAmount - parseInt(contribution);
+      new Tempo(web3).then(function(_tempo){
+        tempo = _tempo;
+        return Project.new(title, targetAmount, deadline, {from:owner});
+      })
+      .then(function(_project) {
+        project = _project;
+        return project.fund.sendTransaction({from:backer, value:contribution});
+      })
+      .then(function() {
+        previousBalance = web3.eth.getBalance(backer);
+        return project.fund.sendTransaction({from:backer, value:contribution});
+      })
+      .then(function(){
+        previousOwnerBalance = web3.eth.getBalance(owner);
+        assert(web3.eth.getBalance(backer).toNumber() + contribution - diff  > (previousBalance.toNumber() * 0.98)); // subtract gas fee around 0.2 %;
+        return project.withdrawPayments.sendTransaction({from:owner});
+      })
+      .then(function(){
+        assert(web3.eth.getBalance(owner).toNumber() > (previousOwnerBalance.toNumber() + targetAmount) * 0.98);
+      })
+      .then(done);
+    })
+
+    it('returns the contribition if trying to fund after the deadline', function(done){
       targetAmount = contribution * 2;
       new Tempo(web3).then(function(_tempo){
         tempo = _tempo;
@@ -134,38 +151,12 @@ contract('Project', function(accounts) {
         return tempo.waitForBlocks(1, deadline + a_day);
       })
       .then(function() {
-        previousBalance = web3.eth.getBalance(owner);
-        return project.payout.sendTransaction({from:another_backer});
-      })
-      .catch(function(error){
-        assert.strictEqual(error.toString(), invalid_jump_error);
-        assert.strictEqual(web3.eth.getBalance(project.address).toString(), contribution);
-      })
-      .then(done);
-    })
-
-    it("does not payout if deadline is not passed", function(done){
-      targetAmount = contribution * 2;
-      new Tempo(web3).then(function(_tempo){
-        tempo = _tempo;
-        return Project.new(title, targetAmount, deadline, {from:owner});
-      })
-      .then(function(_project) {
-        project = _project;
+        previousBalance = web3.eth.getBalance(backer);
         return project.fund.sendTransaction({from:backer, value:contribution});
       })
-      .then(function(_project) {
-        return project.fund.sendTransaction({from:another_backer, value:contribution});
-      })
-      .then(function() {
-        return tempo.waitForBlocks(1, deadline - a_day);
-      })
-      .then(function() {
-        previousBalance = web3.eth.getBalance(owner);
-        return project.payout.sendTransaction({from:another_backer});
-      })
-      .catch(function(error){
-        assert.strictEqual(error.toString(), invalid_jump_error);
+      .then(function(){
+        assert(web3.eth.getBalance(backer).toNumber() > (previousBalance.toNumber() * 0.99)); // subtract gas fee around 0.2 %;
+        assert.strictEqual(web3.eth.getBalance(project.address).toNumber(), 0);
       })
       .then(done);
     })
@@ -214,7 +205,7 @@ contract('Project', function(accounts) {
       })
       .catch(function(error){
         assert.strictEqual(error.toString(), invalid_jump_error);
-        assert.strictEqual(web3.eth.getBalance(project.address).toString(), contribution);
+        assert.strictEqual(web3.eth.getBalance(project.address).toNumber(), contribution);
       })
       .then(done);
     })
@@ -244,7 +235,7 @@ contract('Project', function(accounts) {
       })
       .then(function(){
         assert(web3.eth.getBalance(backer).toNumber() > previousBalance.toNumber());
-        assert.strictEqual(web3.eth.getBalance(project.address).toString(), contribution);
+        assert.strictEqual(web3.eth.getBalance(project.address).toNumber(), contribution);
       })
       .then(done);
     })
@@ -270,7 +261,7 @@ contract('Project', function(accounts) {
       .catch(function(error){
         assert.strictEqual(error.toString(), invalid_jump_error);
         assert(web3.eth.getBalance(backer).toNumber() < previousBalance.toNumber());
-        assert.strictEqual(web3.eth.getBalance(project.address).toString(), contribution);
+        assert.strictEqual(web3.eth.getBalance(project.address).toNumber(), contribution);
       })
       .then(done);
     })
