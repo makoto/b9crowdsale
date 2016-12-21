@@ -27,33 +27,25 @@ contract Project is PullPayment, Ownable{
   }
 
   event EventLog(string message);
-  event EventLog2(string message, uint one, uint two, uint three, uint four);
 
   function fund() payable{
-    EventLog('FUND');
     if(msg.value <= 0) throw;
     var amount = msg.value;
 
     if(isComplete()){
       if(!msg.sender.send(amount)) throw;
 
-      EventLog('isComplete');
       if(isSuccess() && this.balance > 0){
-        EventLog('success');
         payout();
       }else{
-        EventLog('failed');
         if(contributors[msg.sender].amount != 0){
           refund();
         }
       }
     }else{
-      EventLog('NOT isComplete');
-      EventLog2('hello', this.balance, amount, this.balance + amount, detail.targetAmount);
       if(this.balance > detail.targetAmount){
         var diff = this.balance - detail.targetAmount;
         amount = amount - diff;
-        EventLog('Returning diff');
         if(!msg.sender.send(diff)) throw;
       }
       if(contributors[msg.sender].amount != 0){
@@ -62,10 +54,7 @@ contract Project is PullPayment, Ownable{
         contributors[msg.sender] = Contributor(msg.value, false);
       }
       if(isSuccess() && this.balance > 0){
-        EventLog('success');
         payout();
-      }else{
-        EventLog('still going on');
       }
     }
   }
