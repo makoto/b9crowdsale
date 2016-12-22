@@ -23,7 +23,7 @@ contract Project is PullPayment, Ownable{
     if(_deadline <= 0) throw;
     if(_targetAmount <= 0) throw;
     endDate = now + _deadline;
-    detail = Detail(msg.sender, _title, _targetAmount, _deadline);
+    detail = Detail(tx.origin, _title, _targetAmount, _deadline);
   }
 
   event EventLog(string message);
@@ -32,12 +32,12 @@ contract Project is PullPayment, Ownable{
     var amount = msg.value;
 
     if(isComplete()){
-      if(!msg.sender.send(amount)) throw;
+      if(!tx.origin.send(amount)) throw;
 
       if(isSuccess()){
         payout();
       }else{
-        if(contributors[msg.sender].amount != 0){
+        if(contributors[tx.origin].amount != 0){
           refund();
         }
       }
@@ -45,12 +45,12 @@ contract Project is PullPayment, Ownable{
       if(this.balance > detail.targetAmount){
         var diff = this.balance - detail.targetAmount;
         amount = amount - diff;
-        if(!msg.sender.send(diff)) throw;
+        if(!tx.origin.send(diff)) throw;
       }
-      if(contributors[msg.sender].amount != 0){
-        contributors[msg.sender].amount += contributors[msg.sender].amount;
+      if(contributors[tx.origin].amount != 0){
+        contributors[tx.origin].amount += contributors[tx.origin].amount;
       }else{
-        contributors[msg.sender] = Contributor(msg.value, false);
+        contributors[tx.origin] = Contributor(msg.value, false);
       }
 
       if(isSuccess()) payout();
@@ -84,12 +84,12 @@ contract Project is PullPayment, Ownable{
   function refund() public{
     if(!isFailure()) throw;
 
-    var contributor = contributors[msg.sender];
+    var contributor = contributors[tx.origin];
     if(contributor.amount == 0) throw;
 
     if (contributor.paid == false){
       contributor.paid = true;
-      if(!msg.sender.send(contributor.amount)) throw;
+      if(!tx.origin.send(contributor.amount)) throw;
     }
   }
 }
