@@ -2,7 +2,7 @@ pragma solidity ^0.4.2;
 import './Project.sol';
 
 contract FundingHub {
-  address[] projects;
+  address[] public projects;
 
   function FundingHub() {
     // constructor
@@ -14,8 +14,11 @@ contract FundingHub {
     The createProject() function should accept all constructor values that the Project contract requires.
   */
   function createProject(bytes32 _title, uint _targetAmount, uint _deadline) public{
-    var projectAddress = new Project(_title, _targetAmount, _deadline);
-    projects.push(projectAddress);
+    projects.push(new Project(_title, _targetAmount, _deadline));
+  }
+
+  function numOfProjects() public returns(uint){
+    return projects.length;
   }
 
   /*
