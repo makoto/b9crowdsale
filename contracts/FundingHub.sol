@@ -17,10 +17,6 @@ contract FundingHub {
     projects.push(new Project(_title, _targetAmount, _deadline));
   }
 
-  function numOfProjects() public returns(uint){
-    return projects.length;
-  }
-
   /*
     This function allows users to contribute to a Project identified by its address.
     contribute calls the fund() function in the individual Project contract
