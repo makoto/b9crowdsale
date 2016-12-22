@@ -22,8 +22,9 @@ contract FundingHub {
     contribute calls the fund() function in the individual Project contract
     and passes on all value attached to the function call.
   */
-  function contribute() public{
 
+  function contribute(address projectAddress) public payable{
+    Project(projectAddress).fund.value(msg.value)();
   }
 
   function numOfProjects() public constant returns (uint){

@@ -2,6 +2,7 @@
 
 contract('FundingHub', function(accounts) {
   var hub;
+  var project;
   var owner = accounts[0];
   var backer = accounts[1];
   var another_backer = accounts[2];
@@ -21,7 +22,7 @@ contract('FundingHub', function(accounts) {
     The createProject() function should accept all constructor values that the Project contract requires.
   */
   describe('createProject', function(){
-    it.only('registers new project', function(done){
+    it('registers new project', function(done){
       FundingHub.new()
         .then(function(_hub) {
           hub = _hub;
@@ -43,6 +44,23 @@ contract('FundingHub', function(accounts) {
     and passes on all value attached to the function call.
   */
   describe('contribute', function(){
-
+    it('contributes to a project', function(done){
+      FundingHub.new()
+        .then(function(_hub) {
+          hub = _hub;
+          return hub.createProject(title, targetAmount, deadline, {from:owner});
+        })
+        .then(function() {
+          return hub.projects.call(0);
+        })
+        .then(function(project_address) {
+          project = Project.at(project_address);
+          return hub.contribute.sendTransaction(project_address, {value:contribution});
+        })
+        .then(function(project_address) {
+          assert.equal(web3.eth.getBalance(project.address).toNumber(), contribution);
+        })
+        .then(done);
+    })
   })
 });

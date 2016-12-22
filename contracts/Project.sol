@@ -27,7 +27,6 @@ contract Project is PullPayment, Ownable{
   }
 
   event EventLog(string message);
-
   function fund() public payable{
     if(msg.value <= 0) throw;
     var amount = msg.value;
