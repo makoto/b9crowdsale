@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "angular": "^1.5.10",
     "zeppelin-solidity": "^1.0.0"
   },
   "devDependencies": {

@@ -4,6 +4,10 @@ module.exports = {
     "app.js": [
       "javascripts/app.js"
     ],
+    "metaCoin.js": [
+      '../node_modules/angular/angular.min.js',
+      "javascripts/metaCoinController.js"
+    ],
     "app.css": [
       "stylesheets/app.css"
     ],
