@@ -8,6 +8,10 @@ module.exports = {
       '../node_modules/angular/angular.min.js',
       "javascripts/metaCoinController.js"
     ],
+    "fundingHub.js": [
+      '../node_modules/angular/angular.min.js',
+      "javascripts/fundingHubController.js"
+    ],
     "app.css": [
       "stylesheets/app.css"
     ],

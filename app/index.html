@@ -6,19 +6,20 @@
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
 
   <link href="./app.css" rel='stylesheet' type='text/css'>
-  <script src="./metaCoin.js"></script>
+  <script src="./fundingHub.js"></script>
   <script src="./app.js"></script>
 </head>
-<body ng-app="metaCoinApp" ng-controller="metaCoinController">
-  <h1>MetaCoin</h1>
-  <h2>Example Truffle Dapp</h2>
-  <h3>You have <span class="black"><span id="balance">{{ balance }}</span></span> META</span></h3>
+<body ng-app="fundingHubApp" ng-controller="fundingHubController">
+  <h1>FundingHub</h1>
+  <h2>Crowdsale Dapp</h2>
+  <h3>We have <span class="black"><span id="projects">{{ numOfProjects }}</span></span> projects listed</span></h3>
 
   <br>
-  <h1>Send</h1>
-  <br><label for="amount">Amount:</label><input type="text" id="amount" ng-model="amount" placeholder="e.g., 95"></input>
-  <br><label for="receiver">To Address:</label><input type="text" id="receiver" ng-model="receiver" placeholder="e.g., 0x93e66d9baea28c17d9fc393b53e3fbdd76899dae"></input>
-  <br><br><button id="send" ng-click="sendCoin(amount, receiver)">Send MetaCoin</button>
+  <h1>Create</h1>
+  <br><label for="title">Project title:</label><input type="text" id="title" ng-model="title" placeholder="e.g., My Awesome Project"></input>
+  <br><label for="target_amount">Target amount:</label><input type="text" id="target_amount" ng-model="target_amount" placeholder="In Ether e.g., 100"></input>
+  <br><label for="deadline">Deadline:</label><input type="text" id="deadline" ng-model="deadline" placeholder="In seconds e.g., 60 "></input>
+  <br><br><button id="create" ng-click="createProject(title, target_amount, deadline)">Create New Project</button>
   <br><br>
   <span id="status"></span>
 </body>
