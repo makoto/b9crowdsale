@@ -10,6 +10,7 @@ module.exports = {
     ],
     "fundingHub.js": [
       '../node_modules/angular/angular.min.js',
+      '../node_modules/moment/moment.js',
       "javascripts/fundingHubController.js"
     ],
     "app.css": [

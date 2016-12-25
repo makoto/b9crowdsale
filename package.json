@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "angular": "^1.5.10",
+    "moment": "^2.17.1",
     "zeppelin-solidity": "^1.0.0"
   },
   "devDependencies": {
