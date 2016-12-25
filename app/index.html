@@ -14,11 +14,27 @@
   <h2>Crowdsale Dapp</h2>
   <h3>We have <span class="black"><span id="projects">{{ numOfProjects }}</span></span> projects listed</span></h3>
 
+  <table style="width:100%">
+    <tr>
+      <th>Title</th>
+      <th>Amount</th>
+      <th>Deadline</th>
+    </tr>
+    <tr ng-repeat="project in projects">
+      <td>{{ project.title }}</td>
+      <td>{{ project.target_amount }} ether</td>
+      <td>{{ project.deadline.toNumber() }}</td>
+    </tr>
+  </table>
+
   <br>
   <h1>Create</h1>
-  <br><label for="title">Project title:</label><input type="text" id="title" ng-model="title" placeholder="e.g., My Awesome Project"></input>
-  <br><label for="target_amount">Target amount:</label><input type="text" id="target_amount" ng-model="target_amount" placeholder="In Ether e.g., 100"></input>
-  <br><label for="deadline">Deadline:</label><input type="text" id="deadline" ng-model="deadline" placeholder="In seconds e.g., 60 "></input>
+  <br><label for="title">Project title:</label>
+  <input type="text" id="title" ng-model="title" placeholder="e.g., My Awesome Project" required></input>
+  <br><label for="target_amount">Target amount:</label>
+  <input type="text" id="target_amount" ng-model="target_amount" placeholder="In Ether e.g., 100" required></input>
+  <br><label for="deadline">Deadline:</label>
+  <input type="text" id="deadline" ng-model="deadline" placeholder="In seconds e.g., 60 " required></input>
   <br><br><button id="create" ng-click="createProject(title, target_amount, deadline)">Create New Project</button>
   <br><br>
   <span id="status"></span>

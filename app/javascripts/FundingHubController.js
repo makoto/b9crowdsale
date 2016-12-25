@@ -33,7 +33,7 @@ app.controller("fundingHubController", [ '$scope', '$location', '$http', '$q', '
        var projects = resultsArray.map(function(detail){
          return {
            owner: detail[0],
-           title: detail[1],
+           title: web3.toUtf8(detail[1]),
            target_amount: parseInt(web3.fromWei(detail[2], 'ether')),
            deadline: detail[3]
          }
