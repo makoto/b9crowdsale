@@ -10,70 +10,16 @@ app.controller("fundingHubController", [ '$scope', '$location', '$http', '$q', '
   $scope.account = "";
   $scope.balance = "";
   $scope.hub = FundingHub.deployed();
-  // EthereumService.hello('Jiin', function(name){
-  //   console.log('callback', name);
-  //   $timeout(function () {
-  //     $scope.hello = name;
-  //   });
-  // });
-  EthereumService.asyncHello('Jiin')
-    .then(function(name){
-      console.log('callback2', name);
-      $timeout(function () {
-        $scope.hello = name;
-      });
-    })
-  //
-  // EthereumService.refreshProjects()
-  //   .then(function(response){
-  //     console.log('callback2', response);
-  //     $timeout(function () {
-  //       // $scope.hello = name;
-  //     });
-  //   })
-
 
   $scope.refreshProjects = function() {
-     $scope.hub.numOfProjects.call()
-     .then(function(value) {
-       var allRequests = []; // Or {}
-       for (index = 0; index < value; index++) {
-         allRequests.push($scope.hub.projects.call(index));
-       }
-       return $q.all(allRequests);
-     }).then(function(resultsArray) {
-       var allRequests = resultsArray.map(function(project_address){
-         var project = Project.at(project_address);
-         return project.detail.call();
-       })
-       return $q.all(allRequests);
-     }).then(function(resultsArray) {
-       var projects = resultsArray.map(function(detail){
-         var d = new Date((detail[3]) * 1000);
-         var ended = false;
-         var now = new Date();
-         if ((d - now) < 0 ) {
-           ended = true;
-         }
-         return {
-           owner: detail[0],
-           title: web3.toUtf8(detail[1]),
-           target_amount: parseInt(web3.fromWei(detail[2], 'ether')),
-           deadline_in_second: d,
-           deadline_for_display: moment(d).fromNow(),
-           ended: ended
-         }
-       })
-       console.log('projects', projects);
-       console.log(projects.filter(function(p){ return !p.ended }));
-       $timeout(function () {
-           $scope.projects = projects;
-           $scope.all_projects_count = projects.length;
-           $scope.active_projects_count = projects.filter(function(p){ return !p.ended }).length;
-       });
-     }).catch(function(e) {
-
-     });
+    EthereumService.refreshProjects()
+      .then(function(projects){
+        $timeout(function () {
+            $scope.projects = projects;
+            $scope.all_projects_count = projects.length;
+            $scope.active_projects_count = projects.filter(function(p){ return !p.ended }).length;
+        });
+      })
   };
 
   $window.onload = function () {
@@ -92,7 +38,3 @@ app.controller("fundingHubController", [ '$scope', '$location', '$http', '$q', '
      });
   }
 }]);
-
-// app.controller("projectsController", [ '$scope', '$location', '$http', '$q', '$window', '$timeout', function($scope , $location, $http, $q, $window, $timeout) {
-//
-// }]);

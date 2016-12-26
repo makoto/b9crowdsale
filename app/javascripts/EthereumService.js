@@ -1,27 +1,48 @@
 var ethereumModule = angular.module('ethereumModule', []);
-
-ethereumModule.factory('EthereumFactory', function(){
+ethereumModule.factory('EthereumFactory', function($q){
   var factory = {};
-  factory.hello = function(name, cb){
-    setTimeout(function(){
-      console.log('world', name);
-      cb(name);
-    }, 1000)
-    console.log('hello');
-  }
-  factory.asyncHello = function(name){
+
+  factory.refreshProjects = function() {
     return new Promise(function(resolve, reject){
-      setTimeout(function(){
-        console.log('world', name);
-        resolve(name);
-      }, 1000)
-      console.log('hello');
+      var hub = FundingHub.deployed();
+      hub.numOfProjects.call()
+        .then(function(value) {
+          var allRequests = []; // Or {}
+          for (index = 0; index < value; index++) {
+            allRequests.push(hub.projects.call(index));
+          }
+          return $q.all(allRequests);
+        }).then(function(resultsArray) {
+          var allRequests = resultsArray.map(function(project_address){
+            var project = Project.at(project_address);
+            return project.detail.call();
+          })
+          return $q.all(allRequests);
+        }).then(function(resultsArray) {
+          var projects = resultsArray.map(function(detail){
+            var d = new Date((detail[3]) * 1000);
+            var ended = false;
+            var now = new Date();
+            if ((d - now) < 0 ) {
+              ended = true;
+            }
+            return {
+              owner: detail[0],
+              title: web3.toUtf8(detail[1]),
+              target_amount: parseInt(web3.fromWei(detail[2], 'ether')),
+              deadline_in_second: d,
+              deadline_for_display: moment(d).fromNow(),
+              ended: ended
+            }
+          })
+          resolve(projects)
+        }).catch(function(e) {});
     })
-  }
+  };
+
   return factory;
 })
 
 ethereumModule.service('EthereumService', function(EthereumFactory){
-  this.hello = EthereumFactory.hello;
-  this.asyncHello = EthereumFactory.asyncHello;
+  this.refreshProjects = EthereumFactory.refreshProjects;
 })
