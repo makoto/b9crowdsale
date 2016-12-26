@@ -11,7 +11,8 @@ module.exports = {
     "fundingHub.js": [
       '../node_modules/angular/angular.min.js',
       '../node_modules/moment/moment.js',
-      "javascripts/fundingHubController.js"
+      'javascripts/EthereumService.js',
+      'javascripts/FundingHubController.js'
     ],
     "app.css": [
       "stylesheets/app.css"

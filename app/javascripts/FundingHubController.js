@@ -1,15 +1,37 @@
-var app = angular.module('fundingHubApp', []);
+var app = angular.module('fundingHubApp', ['ethereumModule']);
 
 app.config(function ($locationProvider) {
   $locationProvider.html5Mode(true);
 });
 
-app.controller("fundingHubController", [ '$scope', '$location', '$http', '$q', '$window', '$timeout', function($scope , $location, $http, $q, $window, $timeout) {
+app.controller("fundingHubController", [ '$scope', '$location', '$http', '$q', '$window', '$timeout', 'EthereumService', function($scope , $location, $http, $q, $window, $timeout, EthereumService) {
     // Everything else will come in here.
   $scope.accounts = [];
   $scope.account = "";
   $scope.balance = "";
-  $scope.hub = FundingHub.deployed();;
+  $scope.hub = FundingHub.deployed();
+  // EthereumService.hello('Jiin', function(name){
+  //   console.log('callback', name);
+  //   $timeout(function () {
+  //     $scope.hello = name;
+  //   });
+  // });
+  EthereumService.asyncHello('Jiin')
+    .then(function(name){
+      console.log('callback2', name);
+      $timeout(function () {
+        $scope.hello = name;
+      });
+    })
+  //
+  // EthereumService.refreshProjects()
+  //   .then(function(response){
+  //     console.log('callback2', response);
+  //     $timeout(function () {
+  //       // $scope.hello = name;
+  //     });
+  //   })
+
 
   $scope.refreshProjects = function() {
      $scope.hub.numOfProjects.call()
@@ -65,9 +87,12 @@ app.controller("fundingHubController", [ '$scope', '$location', '$http', '$q', '
 
   $scope.createProject = function(title, target_amount, deadline) {
      $scope.hub.createProject.sendTransaction(title, web3.toWei(target_amount), deadline, {from: $scope.account, gas:1000000}).then(function() {
-       console.log('hello');
        $scope.refreshProjects();
      }).catch(function(e) {
      });
   }
 }]);
+
+// app.controller("projectsController", [ '$scope', '$location', '$http', '$q', '$window', '$timeout', function($scope , $location, $http, $q, $window, $timeout) {
+//
+// }]);
