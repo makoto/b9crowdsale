@@ -17,6 +17,7 @@
     "zeppelin-solidity": "^1.0.0"
   },
   "devDependencies": {
+    "ethereumjs-testrpc": "^3.0.3",
     "@digix/tempo": "0.0.3"
   }
 }

@@ -7,15 +7,21 @@ contract('Project', function(accounts) {
   var backer = accounts[1];
   var another_backer = accounts[2];
   var title = 'My pet project';
-  var targetAmount = parseInt(web3.toWei(10));
-  var contribution = parseInt(web3.toWei(1));
   var a_day = 1 * 60 * 60 * 24 // 1 day
   var deadline = a_day * 8;
   var invalid_jump_error = 'Error: VM Exception while processing transaction: invalid JUMP';
   var previousBalance, previousOwnerBalance;
+  var TestRPC = require('ethereumjs-testrpc')
+  var Web3 = require('web3')
+  // var startTime = new Date(); // "Wed Aug 24 2016 00:00:00 GMT-0700 (PDT)"
+  // var provider = TestRPC.provider({time: startTime});
+  // var web3 = new Web3(provider);
+  var targetAmount = parseInt(web3.toWei(10));
+  var contribution = parseInt(web3.toWei(1));
 
   describe('constructor', function(){
     it('creates new project', function(done){
+      var date = new Date();
       Project.new(title, targetAmount, deadline, {from:owner})
       .then(function(_project) {
         project = _project;
@@ -25,7 +31,7 @@ contract('Project', function(accounts) {
         assert.strictEqual(detail[0], owner);
         assert.strictEqual(web3.toUtf8(detail[1]), title);
         assert.strictEqual(detail[2].toNumber(), targetAmount);
-        assert.strictEqual(detail[3].toNumber(), deadline);
+        assert.strictEqual(detail[3].toNumber(), parseInt((date.getTime() / 1000) + deadline));
       })
       .then(done);
     })

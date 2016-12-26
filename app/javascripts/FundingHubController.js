@@ -12,15 +12,11 @@ app.controller("fundingHubController", [ '$scope', '$location', '$http', '$q', '
 
   $scope.refreshProjects = function() {
      var hub = FundingHub.deployed();
-     console.log('numOfProjects 1');
      hub.numOfProjects.call()
      .then(function(value) {
-       console.log('numOfProjects 2', value);
        var allRequests = []; // Or {}
-       console.log('value', value);
        for (index = 0; index < value; index++) {
-           console.log(index);
-           allRequests.push(hub.projects.call(index));
+         allRequests.push(hub.projects.call(index));
        }
        return $q.all(allRequests);
      }).then(function(resultsArray) {
@@ -31,17 +27,27 @@ app.controller("fundingHubController", [ '$scope', '$location', '$http', '$q', '
        return $q.all(allRequests);
      }).then(function(resultsArray) {
        var projects = resultsArray.map(function(detail){
+         var d = new Date((detail[3]) * 1000);
+         var ended = false;
+         var now = new Date();
+         if ((d - now) < 0 ) {
+           ended = true;
+         }
          return {
            owner: detail[0],
            title: web3.toUtf8(detail[1]),
            target_amount: parseInt(web3.fromWei(detail[2], 'ether')),
-           deadline: detail[3]
+           deadline_in_second: d,
+           deadline_for_display: moment(d).fromNow(),
+           ended: ended
          }
        })
        console.log('projects', projects);
+       console.log(projects.filter(function(p){ return !p.ended }));
        $timeout(function () {
            $scope.projects = projects;
-           $scope.numOfProjects = projects.length;
+           $scope.all_projects_count = projects.length;
+           $scope.active_projects_count = projects.filter(function(p){ return !p.ended }).length;
        });
      }).catch(function(e) {
 

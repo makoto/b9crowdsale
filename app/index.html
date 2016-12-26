@@ -12,7 +12,9 @@
 <body ng-app="fundingHubApp" ng-controller="fundingHubController">
   <h1>FundingHub</h1>
   <h2>Crowdsale Dapp</h2>
-  <h3>We have <span class="black"><span id="projects">{{ numOfProjects }}</span></span> projects listed</span></h3>
+  <h3>We have
+    <span class="black">
+      <span id="projects">{{ active_projects_count }}</span> active projects listed ({{ all_projects_count - active_projects_count }} finished)</span></h3>
 
   <table style="width:100%">
     <tr>
@@ -23,7 +25,7 @@
     <tr ng-repeat="project in projects">
       <td>{{ project.title }}</td>
       <td>{{ project.target_amount }} ether</td>
-      <td>{{ project.deadline.toNumber() }}</td>
+      <td>{{ project.deadline_for_display }}</td>
     </tr>
   </table>
 
@@ -32,9 +34,9 @@
   <br><label for="title">Project title:</label>
   <input type="text" id="title" ng-model="title" placeholder="e.g., My Awesome Project" required></input>
   <br><label for="target_amount">Target amount:</label>
-  <input type="text" id="target_amount" ng-model="target_amount" placeholder="In Ether e.g., 100" required></input>
+  <input type="text" type="number" pattern="\d+" min="1" max="99999999999999999" id="target_amount" ng-model="target_amount" placeholder="In Ether e.g., 100" required></input>
   <br><label for="deadline">Deadline:</label>
-  <input type="text" id="deadline" ng-model="deadline" placeholder="In seconds e.g., 60 " required></input>
+  <input type="text" type="number" pattern="\d+" min="1" id="deadline" ng-model="deadline" placeholder="In seconds e.g., 60 " required></input>
   <br><br><button id="create" ng-click="createProject(title, target_amount, deadline)">Create New Project</button>
   <br><br>
   <span id="status"></span>

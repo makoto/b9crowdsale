@@ -4,7 +4,7 @@ import 'zeppelin/Ownable.sol';
 
 contract Project is PullPayment, Ownable{
   Detail public detail;
-  uint public endDate;
+  uint public deadline;
   struct Detail{
     address owner;
     bytes32 title;
@@ -22,8 +22,7 @@ contract Project is PullPayment, Ownable{
   function Project(bytes32 _title, uint _targetAmount, uint _deadline) {
     if(_deadline <= 0) throw;
     if(_targetAmount <= 0) throw;
-    endDate = now + _deadline;
-    detail = Detail(tx.origin, _title, _targetAmount, _deadline);
+    detail = Detail(tx.origin, _title, _targetAmount, now + _deadline);
   }
 
   event EventLog(string message);
@@ -58,7 +57,7 @@ contract Project is PullPayment, Ownable{
   }
 
   function isComplete() constant returns(bool){
-    return now > endDate;
+    return now > detail.deadline;
   }
 
   function isSuccess() constant returns(bool){
