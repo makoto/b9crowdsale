@@ -9,14 +9,14 @@ app.controller("fundingHubController", [ '$scope', '$location', '$http', '$q', '
   $scope.accounts = [];
   $scope.account = "";
   $scope.balance = "";
+  $scope.hub = FundingHub.deployed();;
 
   $scope.refreshProjects = function() {
-     var hub = FundingHub.deployed();
-     hub.numOfProjects.call()
+     $scope.hub.numOfProjects.call()
      .then(function(value) {
        var allRequests = []; // Or {}
        for (index = 0; index < value; index++) {
-         allRequests.push(hub.projects.call(index));
+         allRequests.push($scope.hub.projects.call(index));
        }
        return $q.all(allRequests);
      }).then(function(resultsArray) {
@@ -64,8 +64,7 @@ app.controller("fundingHubController", [ '$scope', '$location', '$http', '$q', '
   }
 
   $scope.createProject = function(title, target_amount, deadline) {
-     var hub = FundingHub.deployed();
-     hub.createProject.sendTransaction(title, web3.toWei(target_amount), deadline, {from: $scope.account, gas:1000000}).then(function() {
+     $scope.hub.createProject.sendTransaction(title, web3.toWei(target_amount), deadline, {from: $scope.account, gas:1000000}).then(function() {
        console.log('hello');
        $scope.refreshProjects();
      }).catch(function(e) {
