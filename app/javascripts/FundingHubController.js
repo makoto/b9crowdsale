@@ -1,40 +1,60 @@
-var app = angular.module('fundingHubApp', ['ethereumModule']);
 
-app.config(function ($locationProvider) {
-  $locationProvider.html5Mode(true);
-});
+projectDetailModeule = angular.module('projectDetailModeule', []);
+projectDetailModeule
+  .component('projectDetail', {
+    templateUrl: '/project-detail.html',
+    controller: function($scope , $location, $http, $q, $window, $timeout, $routeParams, EthereumService){
+      $scope.project_id = $routeParams.id;
+    }
+  })
 
-app.controller("fundingHubController", [ '$scope', '$location', '$http', '$q', '$window', '$timeout', 'EthereumService', function($scope , $location, $http, $q, $window, $timeout, EthereumService) {
-    // Everything else will come in here.
-  $scope.accounts = [];
-  $scope.account = "";
-  $scope.balance = "";
-  $scope.hub = FundingHub.deployed();
+hundingHubModule = angular.module('hundingHubModule', []);
+hundingHubModule
+  .component('hundingHub', {
+    templateUrl: '/funding-hub.html',
+    controller: function($scope , $location, $http, $q, $window, $timeout, EthereumService) {
+        // Everything else will come in here.
+      $scope.accounts = [];
+      $scope.account = "";
+      $scope.balance = "";
 
-  $scope.refreshProjects = function() {
-    EthereumService.refreshProjects()
-      .then(function(projects){
-        $timeout(function () {
-            $scope.projects = projects;
-            $scope.all_projects_count = projects.length;
-            $scope.active_projects_count = projects.filter(function(p){ return !p.ended }).length;
-        });
-      })
-  };
+      $scope.refreshProjects = function() {
+        EthereumService.refreshProjects()
+          .then(function(projects){
+            $timeout(function () {
+                $scope.projects = projects;
+                $scope.all_projects_count = projects.length;
+                $scope.active_projects_count = projects.filter(function(p){ return !p.ended }).length;
+            });
+          })
+      };
 
-  $window.onload = function () {
-     web3.eth.getAccounts(function(err, accs) {
-         // Same as before
+       web3.eth.getAccounts(function(err, accs) {
          $scope.accounts = accs;
          $scope.account = $scope.accounts[0];
          $scope.refreshProjects();
-     });
-  }
+       });
 
-  $scope.createProject = function(title, target_amount, deadline) {
-     $scope.hub.createProject.sendTransaction(title, web3.toWei(target_amount), deadline, {from: $scope.account, gas:1000000}).then(function() {
-       $scope.refreshProjects();
-     }).catch(function(e) {
-     });
-  }
-}]);
+      $scope.createProject = function(title, target_amount, deadline) {
+        var hub = FundingHub.deployed();
+
+         hub.createProject.sendTransaction(title, web3.toWei(target_amount), deadline, {from: $scope.account, gas:1000000}).then(function() {
+           $scope.refreshProjects();
+         }).catch(function(e) {
+         });
+      }
+    }
+})
+
+var app = angular.module('fundingHubApp', ['ngRoute', 'ethereumModule', 'hundingHubModule', 'projectDetailModeule']);
+
+app.config(function ($locationProvider, $routeProvider) {
+  $routeProvider
+    .when('/', {
+      template: "<hunding-hub></hunding-hub>"
+    })
+    .when('/project/:id', {
+      template: "<project-detail></project-detail>"
+    })
+    .otherwise({redirectTo:'/'})
+});

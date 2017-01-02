@@ -1,0 +1,37 @@
+<h3>We have
+  <span class="black">
+    <span id="projects">{{ active_projects_count }}</span> active projects listed ({{ all_projects_count - active_projects_count }} finished)</span></h3>
+
+<table style="width:100%">
+  <tr>
+    <th>Title</th>
+    <th>Amount</th>
+    <th>Deadline</th>
+    <th>Created by</th>
+  </tr>
+  <tr ng-repeat="project in projects">
+    <td><a ng-href='#project/{{ project.address }}'>{{ project.title }}</a></td>
+    <td>{{ project.target_amount }} ether</td>
+    <td>{{ project.deadline_in_second.toString() }}</td>
+    <td>{{ project.owner.slice(0,10) }} ...</td>
+  </tr>
+</table>
+
+<br>
+<h2>Create new project</h2>
+<br/><label for="title">Title:</label>
+<input type="text" id="title" ng-model="title" placeholder="e.g., My Awesome Project" required></input>
+<br/><label for="target_amount">Target:</label>
+<input type="text" type="number" pattern="\d+" min="1" max="99999999999999999" id="target_amount" ng-model="target_amount" placeholder="In Ether e.g., 100" required></input>
+<br/><label for="deadline">Deadline:</label>
+<input type="text" type="number" pattern="\d+" min="1" id="deadline" ng-model="deadline" placeholder="In seconds e.g., 60 " required></input>
+<br/>
+<label>Account:
+  <select ng-model="account"
+    ng-options="account for account in accounts">
+  </select>
+</label><br/>
+
+<br><br><button id="create" ng-click="createProject(title, target_amount, deadline)">Create New Project</button>
+<br><br>
+<span id="status"></span>

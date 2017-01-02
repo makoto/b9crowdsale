@@ -5,6 +5,8 @@ ethereumModule.factory('EthereumFactory', function($q){
   factory.refreshProjects = function() {
     return new Promise(function(resolve, reject){
       var hub = FundingHub.deployed();
+      var projects = [];
+      var project_addresses = [];
       hub.numOfProjects.call()
         .then(function(value) {
           var allRequests = []; // Or {}
@@ -13,20 +15,22 @@ ethereumModule.factory('EthereumFactory', function($q){
           }
           return $q.all(allRequests);
         }).then(function(resultsArray) {
+          project_addresses = resultsArray;
           var allRequests = resultsArray.map(function(project_address){
             var project = Project.at(project_address);
             return project.detail.call();
           })
           return $q.all(allRequests);
         }).then(function(resultsArray) {
-          var projects = resultsArray.map(function(detail){
+          resultsArray.forEach(function(detail, index){
             var d = new Date((detail[3]) * 1000);
             var ended = false;
             var now = new Date();
             if ((d - now) < 0 ) {
               ended = true;
             }
-            return {
+            projects[index] = {
+              address: project_addresses[index],
               owner: detail[0],
               title: web3.toUtf8(detail[1]),
               target_amount: parseInt(web3.fromWei(detail[2], 'ether')),
