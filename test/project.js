@@ -72,6 +72,11 @@ contract('Project', function(accounts) {
       .then(function(contributor) {
         assert.strictEqual(contributor[0].toString(), (contribution * 2).toString());
         assert.strictEqual(contributor[1], false);
+        return project.detail.call()
+      })
+      .then(function(detail){
+        assert.strictEqual(detail[4].toNumber(), 1);
+        assert.strictEqual(detail[5].toNumber(), contribution * 2);
       })
       .then(done);
     })

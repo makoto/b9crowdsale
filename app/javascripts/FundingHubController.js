@@ -16,6 +16,16 @@ projectDetailModeule
           })
       };
 
+      $scope.contribute = function(project_id, amount){
+        var hub = FundingHub.deployed();
+        console.log('contributing', project_id, web3.toWei(amount));
+        hub.contribute.sendTransaction(project_id, {value:web3.toWei(amount), from: $scope.account, gas:1000000}).then(function() {
+          console.log('contributed');
+          $scope.refreshProjects();
+        }).catch(function(e) {
+        });
+      }
+
       EthereumService.getAccounts()
         .then(function(accounts){
           $timeout(function () {
