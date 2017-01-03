@@ -6,5 +6,13 @@
   </head>
   <body>
     this is project {{project_id}}
+    <ul>
+      <li>{{project.title}}</li>
+      <li>{{project.target_amount}}</li>
+      <li>{{project.deadline_in_second.toString()}}</li>
+      <li>{{project.owner.slice(0,10)}}...</li>
+      <li>{{project.contributors}} contributors</li>
+      <li>{{project.contributions}} contributions</li>
+    </ul>
   </body>
 </html>

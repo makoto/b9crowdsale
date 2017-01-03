@@ -10,7 +10,7 @@
     <th>Created by</th>
   </tr>
   <tr ng-repeat="project in projects">
-    <td><a ng-href='#project/{{ project.address }}'>{{ project.title }}</a></td>
+    <td><a ng-href='#project/{{ project.project_id }}'>{{ project.title }}</a></td>
     <td>{{ project.target_amount }} ether</td>
     <td>{{ project.deadline_in_second.toString() }}</td>
     <td>{{ project.owner.slice(0,10) }} ...</td>

@@ -5,6 +5,26 @@ projectDetailModeule
     templateUrl: '/project-detail.html',
     controller: function($scope , $location, $http, $q, $window, $timeout, $routeParams, EthereumService){
       $scope.project_id = $routeParams.id;
+      $scope.refreshProjects = function() {
+        EthereumService.refreshProjects()
+          .then(function(projects){
+            console.log('projects', projects)
+            $timeout(function () {
+              $scope.project = projects.filter(function(project){return project.project_id == $scope.project_id})[0];
+              console.log('project', $scope.project)
+            });
+          })
+      };
+
+      EthereumService.getAccounts()
+        .then(function(accounts){
+          $timeout(function () {
+            $scope.accounts = accounts;
+            $scope.account = $scope.accounts[0];
+            $scope.refreshProjects();
+          });
+        })
+
     }
   })
 

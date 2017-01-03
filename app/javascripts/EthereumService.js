@@ -30,12 +30,14 @@ ethereumModule.factory('EthereumFactory', function($q){
               ended = true;
             }
             projects[index] = {
-              address: project_addresses[index],
+              project_id: project_addresses[index],
               owner: detail[0],
               title: web3.toUtf8(detail[1]),
               target_amount: parseInt(web3.fromWei(detail[2], 'ether')),
               deadline_in_second: d,
               deadline_for_display: moment(d).fromNow(),
+              contributors: detail[4],
+              contributions: detail[5],
               ended: ended
             }
           })
