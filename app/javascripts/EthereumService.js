@@ -44,9 +44,21 @@ ethereumModule.factory('EthereumFactory', function($q){
     })
   };
 
+  factory.getAccounts = function(){
+    return new Promise(function(resolve, reject){
+      web3.eth.getAccounts(function(err, accs) {
+        if (err) {
+          reject(err);
+        }else{
+          resolve(accs);
+        }
+      });
+    })
+  }
   return factory;
 })
 
 ethereumModule.service('EthereumService', function(EthereumFactory){
   this.refreshProjects = EthereumFactory.refreshProjects;
+  this.getAccounts = EthereumFactory.getAccounts;
 })

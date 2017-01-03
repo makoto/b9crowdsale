@@ -29,11 +29,14 @@ hundingHubModule
           })
       };
 
-       web3.eth.getAccounts(function(err, accs) {
-         $scope.accounts = accs;
-         $scope.account = $scope.accounts[0];
-         $scope.refreshProjects();
-       });
+      EthereumService.getAccounts()
+        .then(function(accounts){
+          $timeout(function () {
+            $scope.accounts = accounts;
+            $scope.account = $scope.accounts[0];
+            $scope.refreshProjects();
+          });
+        })
 
       $scope.createProject = function(title, target_amount, deadline) {
         var hub = FundingHub.deployed();
