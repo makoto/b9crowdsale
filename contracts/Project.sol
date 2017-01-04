@@ -12,6 +12,7 @@ contract Project is PullPayment, Ownable{
     uint deadline;
     uint contributors;
     uint contributions;
+    boolean completed;
   }
 
   struct Contributor{
@@ -24,7 +25,7 @@ contract Project is PullPayment, Ownable{
   function Project(bytes32 _title, uint _targetAmount, uint _deadline) {
     if(_deadline <= 0) throw;
     if(_targetAmount <= 0) throw;
-    detail = Detail(tx.origin, _title, _targetAmount, now + _deadline, 0, 0);
+    detail = Detail(tx.origin, _title, _targetAmount, now + _deadline, 0, 0, false);
   }
 
   event EventLog(string message);
@@ -33,8 +34,9 @@ contract Project is PullPayment, Ownable{
     var amount = msg.value;
 
     if(isComplete()){
+      detail.completed = true;
       if(!tx.origin.send(amount)) throw;
-
+      detail.contributions = this.balance;
       if(isSuccess()){
         payout();
       }else{
@@ -51,11 +53,14 @@ contract Project is PullPayment, Ownable{
       if(contributors[tx.origin].amount != 0){
         contributors[tx.origin].amount += contributors[tx.origin].amount;
       }else{
-        detail.contributors+=1;
+        detail.contributors=detail.contributors+1;
         contributors[tx.origin] = Contributor(msg.value, false);
       }
       detail.contributions = this.balance;
-      if(isSuccess()) payout();
+      if(isSuccess()){
+        detail.completed = true;
+        payout();
+      }
     }
   }
 
