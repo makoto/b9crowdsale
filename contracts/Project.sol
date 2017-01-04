@@ -33,7 +33,7 @@ contract Project is PullPayment, Ownable{
     if(msg.value <= 0) throw;
     var amount = msg.value;
 
-    if(isComplete()){
+    if(isTimedOut()){
       detail.completed = true;
       if(!tx.origin.send(amount)) throw;
       detail.contributions = this.balance;
@@ -64,7 +64,7 @@ contract Project is PullPayment, Ownable{
     }
   }
 
-  function isComplete() constant returns(bool){
+  function isTimedOut() constant returns(bool){
     return now > detail.deadline;
   }
 
@@ -73,7 +73,7 @@ contract Project is PullPayment, Ownable{
   }
 
   function isFailure() constant returns(bool){
-    return isComplete() && (this.balance < detail.targetAmount);
+    return isTimedOut() && (this.balance < detail.targetAmount);
   }
 
   /*
