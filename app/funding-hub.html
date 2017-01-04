@@ -11,9 +11,9 @@
     <th>Created by</th>
   </tr>
   <tr ng-repeat="project in projects">
-    <td>{{ project.result }}</td>
+    <td class={{project.result}}>{{ project.result }}</td>
     <td><a ng-href='#project/{{ project.project_id }}'>{{ project.title }}</a></td>
-    <td>{{ project.target_amount }} ether</td>
+    <td>{{ project.target_amount }} ether ( {{ project.achivement.toString() }} % raised )</td>
     <td>{{ project.deadline_for_display }}</td>
     <td>{{ project.owner.slice(0,10) }} ...</td>
   </tr>
@@ -24,7 +24,7 @@
 <br/><label for="title">Title:</label>
 <input type="text" id="title" ng-model="title" placeholder="e.g., My Awesome Project" required></input>
 <br/><label for="target_amount">Target:</label>
-<input type="text" type="number" pattern="\d+" min="1" max="99999999999999999" id="target_amount" ng-model="target_amount" placeholder="In Ether e.g., 100" required></input>
+<input type="text" type="number" pattern="\d+(\.)?(\d+)?" min="1" max="99999999999999999" id="target_amount" ng-model="target_amount" placeholder="In Ether e.g., 100" required></input>
 <br/><label for="deadline">Deadline:</label>
 <input type="text" type="number" pattern="\d+" min="1" id="deadline" ng-model="deadline" placeholder="In seconds e.g., 60 " required></input>
 <br/>

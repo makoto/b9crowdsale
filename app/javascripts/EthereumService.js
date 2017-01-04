@@ -7,7 +7,6 @@ function getStatus(number){
 ethereumModule.factory('EthereumFactory', function($q){
   var factory = {};
 
-
   factory.refreshProjects = function() {
     return new Promise(function(resolve, reject){
       var hub = FundingHub.deployed();
@@ -39,14 +38,15 @@ ethereumModule.factory('EthereumFactory', function($q){
               project_id: project_addresses[index],
               owner: detail[0],
               title: web3.toUtf8(detail[1]),
-              target_amount: parseInt(web3.fromWei(detail[2], 'ether')),
+              target_amount: parseFloat(web3.fromWei(detail[2], 'ether')),
               deadline_in_second: d,
               deadline_for_display: moment(d).fromNow(),
               contributors: detail[4].toNumber(),
-              contributions: parseInt(web3.fromWei(detail[5], 'ether')),
+              contributions: parseFloat(web3.fromWei(detail[5], 'ether')),
               result: getStatus(detail[6].toNumber()),
               ended: ended
             }
+            projects[index].achivement = projects[index].contributions / projects[index].target_amount * 100;
           })
           resolve(projects)
         }).catch(function(e) {});
