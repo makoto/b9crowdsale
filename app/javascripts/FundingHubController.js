@@ -54,7 +54,7 @@ hundingHubModule
             $timeout(function () {
                 $scope.projects = projects;
                 $scope.all_projects_count = projects.length;
-                $scope.active_projects_count = projects.filter(function(p){ return !p.ended }).length;
+                $scope.active_projects_count = projects.filter(function(p){ return p.result == 'pending' }).length;
             });
           })
       };
