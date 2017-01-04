@@ -4,15 +4,17 @@
 
 <table style="width:100%">
   <tr>
+    <th>Status</th>
     <th>Title</th>
     <th>Amount</th>
     <th>Deadline</th>
     <th>Created by</th>
   </tr>
   <tr ng-repeat="project in projects">
+    <td>{{ project.result }}</td>
     <td><a ng-href='#project/{{ project.project_id }}'>{{ project.title }}</a></td>
     <td>{{ project.target_amount }} ether</td>
-    <td>{{ project.deadline_in_second.toString() }}</td>
+    <td>{{ project.deadline_for_display }}</td>
     <td>{{ project.owner.slice(0,10) }} ...</td>
   </tr>
 </table>
