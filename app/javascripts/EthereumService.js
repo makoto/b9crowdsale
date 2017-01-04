@@ -1,6 +1,12 @@
 var ethereumModule = angular.module('ethereumModule', []);
+
+function getStatus(number){
+  return ['pending', 'success', 'failed'][number]
+}
+
 ethereumModule.factory('EthereumFactory', function($q){
   var factory = {};
+
 
   factory.refreshProjects = function() {
     return new Promise(function(resolve, reject){
@@ -36,8 +42,9 @@ ethereumModule.factory('EthereumFactory', function($q){
               target_amount: parseInt(web3.fromWei(detail[2], 'ether')),
               deadline_in_second: d,
               deadline_for_display: moment(d).fromNow(),
-              contributors: detail[4],
-              contributions: detail[5],
+              contributors: detail[4].toNumber(),
+              contributions: parseInt(web3.fromWei(detail[5], 'ether')),
+              result: getStatus(detail[6].toNumber()),
               ended: ended
             }
           })

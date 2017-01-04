@@ -8,11 +8,12 @@
     this is project {{project_id}}
     <ul>
       <li>{{project.title}}</li>
-      <li>{{project.target_amount}}</li>
-      <li>{{project.deadline_in_second.toString()}}</li>
+      <li>{{project.target_amount}} ether targeted</li>
+      <li>ending date: {{project.deadline_in_second.toString()}}</li>
       <li>{{project.owner.slice(0,10)}}...</li>
-      <li>{{project.contributors.toNumber()}} contributors</li>
-      <li>{{project.contributions.toNumber()}} contributions</li>
+      <li>{{project.contributors}} contributors</li>
+      <li>{{project.contributions}} ether contributed</li>
+      <li>{{ project.result }}</li>
     </ul>
     <h2>Contribute</h2>
     <br/><label for="amount">Amount:</label>
