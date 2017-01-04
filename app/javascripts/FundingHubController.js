@@ -14,23 +14,24 @@ projectDetailModeule
           })
       };
 
-      $scope.contribute = function(amount){
+      $scope.contribute = function(account, amount){
         var hub = FundingHub.deployed();
-        hub.contribute.sendTransaction($scope.project_id, {value:web3.toWei(amount), from: $scope.account, gas:1000000}).then(function() {
+        console.log('account', $scope.account);
+        hub.contribute.sendTransaction($scope.project_id, {value:web3.toWei(amount), from: account, gas:1000000}).then(function() {
           $scope.refreshProjects();
         }).catch(function(e) {});
       }
 
-      $scope.refund = function(){
+      $scope.refund = function(account){
         var project = Project.at($scope.project_id);
-        project.refund.sendTransaction({from: $scope.account, gas:1000000}).then(function() {
+        project.refund.sendTransaction({from: account, gas:1000000}).then(function() {
           $scope.refreshProjects();
         }).catch(function(e) {});
       }
 
-      $scope.withdrawPayments = function(amount){
+      $scope.withdrawPayments = function(account){
         var project = Project.at($scope.project_id);
-        project.withdrawPayments.sendTransaction({from: $scope.account, gas:1000000}).then(function() {
+        project.withdrawPayments.sendTransaction({from: account, gas:1000000}).then(function() {
           $scope.refreshProjects();
         }).catch(function(e) {});
       }
@@ -65,7 +66,7 @@ hundingHubModule
       $scope.accounts = [];
       $scope.account = "";
       $scope.balance = "";
-
+      console.log('fundingHub');
       $scope.refreshProjects = function() {
         EthereumService.refreshProjects()
           .then(function(projects){

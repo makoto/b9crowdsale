@@ -40,7 +40,7 @@
       <tr ng-repeat="contributor in contributors">
         <td>{{ contributor.amount.toNumber() }}</td>
         <td>{{ contributor.time.toNumber() }}</td>
-        <td>{{ contributor.originAddress.slice(0,5) }} ...</td>
+        <td>{{ contributor.originAddress.slice(0,10) }} ...</td>
       </tr>
     </table>
 
@@ -53,7 +53,8 @@
           ng-options="account for account in accounts">
         </select>
       </label><br/>
-      <br><button id="create" ng-click="contribute(amount)">Contribute</button>
+
+      <br><button id="create" ng-click="contribute(account, amount)">Contribute</button>
     </div>
 
     <div ng-if="project.result == 'failed'">
@@ -63,7 +64,8 @@
           ng-options="account for account in accounts">
         </select>
       </label><br/>
-      <br><button id="create" ng-click="refund(amount)">Refund</button>
+
+      <br><button id="create" ng-click="refund(account)">Refund</button>
     </div>
 
     <div ng-if="project.result == 'success'">
@@ -73,7 +75,7 @@
           ng-options="account for account in accounts">
         </select>
       </label><br/>
-      <br><button id="create" ng-click="withdrawPayments(amount)">Withdraw</button> (if you are project owner)
+      <br><button id="create" ng-click="withdrawPayments(account)">Withdraw</button> (if you are project owner)
     </div>
 
   </body>
