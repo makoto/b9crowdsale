@@ -8,19 +8,15 @@ projectDetailModeule
       $scope.refreshProjects = function() {
         EthereumService.refreshProjects()
           .then(function(projects){
-            console.log('projects', projects)
             $timeout(function () {
               $scope.project = projects.filter(function(project){return project.project_id == $scope.project_id})[0];
-              console.log('project', $scope.project)
             });
           })
       };
 
       $scope.contribute = function(project_id, amount){
         var hub = FundingHub.deployed();
-        console.log('contributing', project_id, web3.toWei(amount));
         hub.contribute.sendTransaction(project_id, {value:web3.toWei(amount), from: $scope.account, gas:1000000}).then(function() {
-          console.log('contributed');
           $scope.refreshProjects();
         }).catch(function(e) {
         });
