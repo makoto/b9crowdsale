@@ -50,7 +50,12 @@ projectDetailModeule
       event.watch(function(err,result) {
         if (result.event == 'EventContribution') {
           $timeout(function () {
-            $scope.contributors.push(result.args);
+            var obj = {
+             amount: parseFloat(web3.fromWei(result.args.amount, 'ether')),
+             time:  moment(result.args.time).fromNow(),
+             originAddress: result.args.originAddress
+            }
+            $scope.contributors.push(obj);
           });
         }
       });

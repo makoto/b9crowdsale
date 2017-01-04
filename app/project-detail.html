@@ -38,8 +38,8 @@
         </th>
       </tr>
       <tr ng-repeat="contributor in contributors">
-        <td>{{ contributor.amount.toNumber() }}</td>
-        <td>{{ contributor.time.toNumber() }}</td>
+        <td>{{ contributor.amount }}</td>
+        <td>{{ contributor.time }} ether</td>
         <td>{{ contributor.originAddress.slice(0,10) }} ...</td>
       </tr>
     </table>
