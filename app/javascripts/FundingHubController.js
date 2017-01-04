@@ -44,6 +44,15 @@ projectDetailModeule
           });
         })
 
+      var event = Project.at($scope.project_id).allEvents({fromBlock:0})
+      $scope.contributors = [];
+      event.watch(function(err,result) {
+        if (result.event == 'EventContribution') {
+          $timeout(function () {
+            $scope.contributors.push(result.args);
+          });
+        }
+      });
     }
   })
 

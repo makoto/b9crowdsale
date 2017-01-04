@@ -30,6 +30,7 @@ contract Project is PullPayment, Ownable{
   }
 
   event EventLog(string message);
+  event EventContribution(uint amount, uint time, address contributorAddress, address originAddress);
 
   modifier notCompleted() {
     if (detail.result == resultTypes.pending) _;
@@ -74,6 +75,7 @@ contract Project is PullPayment, Ownable{
         payout();
       }
     }
+    EventContribution(amount, now, msg.sender, tx.origin);
   }
 
   function isTimedOut() constant returns(bool){

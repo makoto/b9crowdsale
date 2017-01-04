@@ -24,6 +24,26 @@
       </tr>
     </table>
 
+    <h2>Contributors</h2>
+    <table>
+      <tr>
+        <th>
+          Amount
+        </th>
+        <th>
+          Date
+        </th>
+        <th>
+          Contributor
+        </th>
+      </tr>
+      <tr ng-repeat="contributor in contributors">
+        <td>{{ contributor.amount.toNumber() }}</td>
+        <td>{{ contributor.time.toNumber() }}</td>
+        <td>{{ contributor.originAddress.slice(0,5) }} ...</td>
+      </tr>
+    </table>
+
     <div ng-if="project.result == 'pending'">
       <h2>Contribute</h2>
       <br/><label for="amount">Amount:</label>
