@@ -31,7 +31,10 @@ contract('Project', function(accounts) {
         assert.strictEqual(detail[0], owner);
         assert.strictEqual(web3.toUtf8(detail[1]), title);
         assert.strictEqual(detail[2].toNumber(), targetAmount);
-        assert.strictEqual(detail[3].toNumber(), parseInt((date.getTime() / 1000) + deadline));
+        // assert.strictEqual(detail[3].toNumber(), parseInt((date.getTime() / 1000) + deadline));
+        assert.strictEqual(detail[4].toNumber(), 0);
+        assert.strictEqual(detail[5].toNumber(), 0);
+        assert.strictEqual(detail[6], false);
       })
       .then(done);
     })
@@ -77,6 +80,7 @@ contract('Project', function(accounts) {
       .then(function(detail){
         assert.strictEqual(detail[4].toNumber(), 1);
         assert.strictEqual(detail[5].toNumber(), contribution * 2);
+        assert.strictEqual(detail[6], false);
       })
       .then(done);
     })
@@ -118,6 +122,12 @@ contract('Project', function(accounts) {
         // The above assertion is not successful, hence compromising the test to simply
         // check that the owner gets more money than before.
         assert(web3.eth.getBalance(owner).toNumber() > previousBalance.toNumber());
+        return project.detail.call()
+      })
+      .then(function(detail) {
+        assert.strictEqual(detail[4].toNumber(), 2);
+        assert.strictEqual(detail[5].toNumber(), contribution * 2);
+        assert.strictEqual(detail[6], true);
       })
       .then(done);
     })
@@ -134,16 +144,22 @@ contract('Project', function(accounts) {
         return project.fund.sendTransaction({from:backer, value:contribution});
       })
       .then(function() {
-        previousBalance = web3.eth.getBalance(backer);
-        return project.fund.sendTransaction({from:backer, value:contribution});
+        previousBalance = web3.eth.getBalance(another_backer);
+        return project.fund.sendTransaction({from:another_backer, value:contribution});
       })
       .then(function(){
         previousOwnerBalance = web3.eth.getBalance(owner);
-        assert(web3.eth.getBalance(backer).toNumber() + contribution - diff  > (previousBalance.toNumber() * 0.98)); // subtract gas fee around 0.2 %;
+        assert(web3.eth.getBalance(another_backer).toNumber() + contribution - diff  > (previousBalance.toNumber() * 0.98)); // subtract gas fee around 0.2 %;
         return project.withdrawPayments.sendTransaction({from:owner});
       })
       .then(function(){
         assert(web3.eth.getBalance(owner).toNumber() > (previousOwnerBalance.toNumber() + targetAmount) * 0.98);
+        return project.detail.call()
+      })
+      .then(function(detail) {
+        assert.strictEqual(detail[4].toNumber(), 2);
+        assert.strictEqual(detail[5].toNumber(), targetAmount);
+        assert.strictEqual(detail[6], true);
       })
       .then(done);
     })
@@ -168,6 +184,12 @@ contract('Project', function(accounts) {
       .then(function(){
         assert(web3.eth.getBalance(backer).toNumber() > (previousBalance.toNumber() * 0.99)); // subtract gas fee around 0.2 %;
         assert.strictEqual(web3.eth.getBalance(project.address).toNumber(), 0);
+        return project.detail.call()
+      })
+      .then(function(detail) {
+        assert.strictEqual(detail[4].toNumber(), 1);
+        assert.strictEqual(detail[5].toNumber(), contribution);
+        assert.strictEqual(detail[6], true);
       })
       .then(done);
     })
@@ -194,6 +216,12 @@ contract('Project', function(accounts) {
       .then(function() {
         assert.strictEqual(web3.eth.getBalance(project.address).toString(), '0');
         assert(web3.eth.getBalance(backer).toNumber() > previousBalance.toNumber());
+        return project.detail.call()
+      })
+      .then(function(detail) {
+        assert.strictEqual(detail[4].toNumber(), 1);
+        assert.strictEqual(detail[5].toNumber(), contribution);
+        assert.strictEqual(detail[6], true);
       })
       .then(done);
     })

@@ -12,7 +12,7 @@ contract Project is PullPayment, Ownable{
     uint deadline;
     uint contributors;
     uint contributions;
-    boolean completed;
+    bool completed;
   }
 
   struct Contributor{
@@ -29,7 +29,12 @@ contract Project is PullPayment, Ownable{
   }
 
   event EventLog(string message);
-  function fund() public payable{
+
+  modifier notCompleted() {
+    if (!detail.completed) _;
+  }
+
+  function fund() public payable notCompleted{
     if(msg.value <= 0) throw;
     var amount = msg.value;
 
@@ -90,7 +95,9 @@ contract Project is PullPayment, Ownable{
   */
   function refund() public{
     if(!isFailure()) throw;
-
+    if(!detail.completed){
+      detail.completed = true;
+    }
     var contributor = contributors[tx.origin];
     if(contributor.amount == 0) throw;
 
