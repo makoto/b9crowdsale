@@ -18,6 +18,11 @@ contract('Project', function(accounts) {
   // var web3 = new Web3(provider);
   var targetAmount = parseInt(web3.toWei(10));
   var contribution = parseInt(web3.toWei(1));
+  var results = {
+    pending:0,
+    success:1,
+    failed:2
+  }
 
   describe('constructor', function(){
     it('creates new project', function(done){
@@ -34,7 +39,7 @@ contract('Project', function(accounts) {
         // assert.strictEqual(detail[3].toNumber(), parseInt((date.getTime() / 1000) + deadline));
         assert.strictEqual(detail[4].toNumber(), 0);
         assert.strictEqual(detail[5].toNumber(), 0);
-        assert.strictEqual(detail[6], false);
+        assert.strictEqual(detail[6].toNumber(), results.pending);
       })
       .then(done);
     })
@@ -80,7 +85,7 @@ contract('Project', function(accounts) {
       .then(function(detail){
         assert.strictEqual(detail[4].toNumber(), 1);
         assert.strictEqual(detail[5].toNumber(), contribution * 2);
-        assert.strictEqual(detail[6], false);
+        assert.strictEqual(detail[6].toNumber(), results.pending);
       })
       .then(done);
     })
@@ -127,7 +132,7 @@ contract('Project', function(accounts) {
       .then(function(detail) {
         assert.strictEqual(detail[4].toNumber(), 2);
         assert.strictEqual(detail[5].toNumber(), contribution * 2);
-        assert.strictEqual(detail[6], true);
+        assert.strictEqual(detail[6].toNumber(), results.success);
       })
       .then(done);
     })
@@ -159,7 +164,7 @@ contract('Project', function(accounts) {
       .then(function(detail) {
         assert.strictEqual(detail[4].toNumber(), 2);
         assert.strictEqual(detail[5].toNumber(), targetAmount);
-        assert.strictEqual(detail[6], true);
+        assert.strictEqual(detail[6].toNumber(), results.success);
       })
       .then(done);
     })
@@ -189,7 +194,7 @@ contract('Project', function(accounts) {
       .then(function(detail) {
         assert.strictEqual(detail[4].toNumber(), 1);
         assert.strictEqual(detail[5].toNumber(), contribution);
-        assert.strictEqual(detail[6], true);
+        assert.strictEqual(detail[6].toNumber(), results.failed);
       })
       .then(done);
     })
@@ -221,7 +226,7 @@ contract('Project', function(accounts) {
       .then(function(detail) {
         assert.strictEqual(detail[4].toNumber(), 1);
         assert.strictEqual(detail[5].toNumber(), contribution);
-        assert.strictEqual(detail[6], true);
+        assert.strictEqual(detail[6].toNumber(), results.failed);
       })
       .then(done);
     })

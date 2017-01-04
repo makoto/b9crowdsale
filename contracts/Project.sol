@@ -5,6 +5,7 @@ import 'zeppelin/Ownable.sol';
 contract Project is PullPayment, Ownable{
   Detail public detail;
   uint public deadline;
+  enum resultTypes { pending, success, failed }
   struct Detail{
     address owner;
     bytes32 title;
@@ -12,7 +13,7 @@ contract Project is PullPayment, Ownable{
     uint deadline;
     uint contributors;
     uint contributions;
-    bool completed;
+    resultTypes result;
   }
 
   struct Contributor{
@@ -25,21 +26,28 @@ contract Project is PullPayment, Ownable{
   function Project(bytes32 _title, uint _targetAmount, uint _deadline) {
     if(_deadline <= 0) throw;
     if(_targetAmount <= 0) throw;
-    detail = Detail(tx.origin, _title, _targetAmount, now + _deadline, 0, 0, false);
+    detail = Detail(tx.origin, _title, _targetAmount, now + _deadline, 0, 0, resultTypes.pending);
   }
 
   event EventLog(string message);
 
   modifier notCompleted() {
-    if (!detail.completed) _;
+    if (detail.result == resultTypes.pending) _;
   }
 
-  function fund() public payable notCompleted{
+  function transitionState() public{
+    if(isFailure()){
+      detail.result = resultTypes.failed;
+    }else if(isSuccess()){
+      detail.result = resultTypes.success;
+    }
+  }
+
+  function fund() public payable{
     if(msg.value <= 0) throw;
     var amount = msg.value;
 
     if(isTimedOut()){
-      detail.completed = true;
       if(!tx.origin.send(amount)) throw;
       detail.contributions = this.balance;
       if(isSuccess()){
@@ -63,7 +71,6 @@ contract Project is PullPayment, Ownable{
       }
       detail.contributions = this.balance;
       if(isSuccess()){
-        detail.completed = true;
         payout();
       }
     }
@@ -74,11 +81,11 @@ contract Project is PullPayment, Ownable{
   }
 
   function isSuccess() constant returns(bool){
-    return this.balance == detail.targetAmount;
+    return detail.contributions == detail.targetAmount;
   }
 
   function isFailure() constant returns(bool){
-    return isTimedOut() && (this.balance < detail.targetAmount);
+    return isTimedOut() && (detail.contributions < detail.targetAmount);
   }
 
   /*
@@ -86,6 +93,7 @@ contract Project is PullPayment, Ownable{
     Will be called by fund().
   */
   function payout() private{
+    detail.result = resultTypes.success;
     if(this.balance > 0) asyncSend(owner, this.balance);
   }
 
@@ -95,9 +103,8 @@ contract Project is PullPayment, Ownable{
   */
   function refund() public{
     if(!isFailure()) throw;
-    if(!detail.completed){
-      detail.completed = true;
-    }
+    detail.result = resultTypes.failed;
+
     var contributor = contributors[tx.origin];
     if(contributor.amount == 0) throw;
 
