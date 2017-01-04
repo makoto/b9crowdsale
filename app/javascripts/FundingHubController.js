@@ -14,12 +14,25 @@ projectDetailModeule
           })
       };
 
-      $scope.contribute = function(project_id, amount){
+      $scope.contribute = function(amount){
         var hub = FundingHub.deployed();
-        hub.contribute.sendTransaction(project_id, {value:web3.toWei(amount), from: $scope.account, gas:1000000}).then(function() {
+        hub.contribute.sendTransaction($scope.project_id, {value:web3.toWei(amount), from: $scope.account, gas:1000000}).then(function() {
           $scope.refreshProjects();
-        }).catch(function(e) {
-        });
+        }).catch(function(e) {});
+      }
+
+      $scope.refund = function(){
+        var project = Project.at($scope.project_id);
+        project.refund.sendTransaction({from: $scope.account, gas:1000000}).then(function() {
+          $scope.refreshProjects();
+        }).catch(function(e) {});
+      }
+
+      $scope.withdrawPayments = function(amount){
+        var project = Project.at($scope.project_id);
+        project.withdrawPayments.sendTransaction({from: $scope.account, gas:1000000}).then(function() {
+          $scope.refreshProjects();
+        }).catch(function(e) {});
       }
 
       EthereumService.getAccounts()

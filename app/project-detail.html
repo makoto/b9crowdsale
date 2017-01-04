@@ -24,14 +24,37 @@
       </tr>
     </table>
 
-    <h2>Contribute</h2>
-    <br/><label for="amount">Amount:</label>
-    <input type="text" type="number" pattern="\d" min="1" max="99999999999999999" id="amount" ng-model="amount" placeholder="In Ether e.g., 100" required></input>
-    <label>Account:
-      <select ng-model="account"
-        ng-options="account for account in accounts">
-      </select>
-    </label><br/>
-    <br><button id="create" ng-click="contribute(project.project_id, amount)">Contribute</button>
+    <div ng-if="project.result == 'pending'">
+      <h2>Contribute</h2>
+      <br/><label for="amount">Amount:</label>
+      <input type="text" type="number" pattern="\d+(\.)?(\d+)?" min="1" max="99999999999999999" id="amount" ng-model="amount" placeholder="In Ether e.g., 100" required></input>
+      <label>Account:
+        <select ng-model="account"
+          ng-options="account for account in accounts">
+        </select>
+      </label><br/>
+      <br><button id="create" ng-click="contribute(amount)">Contribute</button>
+    </div>
+
+    <div ng-if="project.result == 'failed'">
+      <h2>Get refund</h2>
+      <label>Account:
+        <select ng-model="account"
+          ng-options="account for account in accounts">
+        </select>
+      </label><br/>
+      <br><button id="create" ng-click="refund(amount)">Refund</button>
+    </div>
+
+    <div ng-if="project.result == 'success'">
+      <h2>Withdraw fund</h2>
+      <label>Account:
+        <select ng-model="account"
+          ng-options="account for account in accounts">
+        </select>
+      </label><br/>
+      <br><button id="create" ng-click="withdrawPayments(amount)">Withdraw</button> (if you are project owner)
+    </div>
+
   </body>
 </html>
