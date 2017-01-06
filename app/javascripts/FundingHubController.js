@@ -46,17 +46,17 @@ projectDetailModeule
         })
 
       var event = Project.at($scope.project_id).allEvents({fromBlock:0})
-      $scope.contributors = [];
+      $scope.activities = [];
       event.watch(function(err,result) {
         if (result.event == 'EventContribution') {
           $timeout(function () {
-            var obj = {
+            var activity = {
              activity: web3.toUtf8(result.args.activity),
              amount: parseFloat(web3.fromWei(result.args.amount, 'ether')),
              time:  moment(result.args.time * 1000).fromNow(),
              originAddress: result.args.originAddress
             }
-            $scope.contributors.push(obj);
+            $scope.activities.push(activity);
           });
         }
       });

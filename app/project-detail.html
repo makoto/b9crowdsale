@@ -31,7 +31,7 @@
       </tr>
     </table>
 
-    <div class="contributors" ng-if="project.contributors > 0">
+    <div class="activities" ng-if="activities.length > 0">
       </br>
       <h2>Activities</h2>
       <table bordercolor="#aabdeb">
@@ -49,11 +49,11 @@
             Contributor
           </th>
         </tr>
-        <tr ng-repeat="contributor in contributors">
-          <td>{{ contributor.activity }} </td>
-          <td>{{ contributor.amount }} ether</td>
-          <td>{{ contributor.time }} </td>
-          <td>{{ contributor.originAddress }}</td>
+        <tr ng-repeat="activity in activities">
+          <td>{{ activity.activity }} </td>
+          <td>{{ activity.amount }} ether</td>
+          <td>{{ activity.time }} </td>
+          <td>{{ activity.originAddress }}</td>
         </tr>
       </table>
     </div>
