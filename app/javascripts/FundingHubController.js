@@ -51,6 +51,7 @@ projectDetailModeule
         if (result.event == 'EventContribution') {
           $timeout(function () {
             var obj = {
+             activity: web3.toUtf8(result.args.activity),
              amount: parseFloat(web3.fromWei(result.args.amount, 'ether')),
              time:  moment(result.args.time).fromNow(),
              originAddress: result.args.originAddress

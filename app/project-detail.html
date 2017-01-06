@@ -38,6 +38,9 @@
       <table bordercolor="#aabdeb">
         <tr>
           <th>
+            Activity
+          </th>
+          <th>
             Amount
           </th>
           <th>
@@ -48,8 +51,9 @@
           </th>
         </tr>
         <tr ng-repeat="contributor in contributors">
+          <td>{{ contributor.activity }} </td>
           <td>{{ contributor.amount }} ether</td>
-          <td>{{ contributor.time }} ether</td>
+          <td>{{ contributor.time }} </td>
           <td>{{ contributor.originAddress }}</td>
         </tr>
       </table>
