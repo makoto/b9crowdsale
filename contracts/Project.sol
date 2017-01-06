@@ -50,6 +50,7 @@ contract Project is PullPayment, Ownable{
 
     if(isTimedOut()){
       if(!tx.origin.send(amount)) throw;
+      EventContribution('Returned the value', amount, now, msg.sender, tx.origin);
       detail.contributions = this.balance;
       if(isSuccess()){
         payout();
@@ -64,6 +65,7 @@ contract Project is PullPayment, Ownable{
         var diff = this.balance - detail.targetAmount;
         amount = amount - diff;
         if(!tx.origin.send(diff)) throw;
+        EventContribution('Returned the diff', diff, now, msg.sender, tx.origin);
       }
       if(contributors[tx.origin].amount != 0){
         contributors[tx.origin].amount += contributors[tx.origin].amount;
@@ -98,6 +100,7 @@ contract Project is PullPayment, Ownable{
   function payout() private{
     detail.result = resultTypes.success;
     if(this.balance > 0) asyncSend(owner, this.balance);
+    EventContribution('Paid out',this.balance, now, msg.sender, owner);
   }
 
   /*
@@ -114,6 +117,9 @@ contract Project is PullPayment, Ownable{
     if (contributor.paid == false){
       contributor.paid = true;
       if(!tx.origin.send(contributor.amount)) throw;
+      EventContribution('Refunded', contributor.amount, now, msg.sender, tx.origin);
+    }else{
+      EventContribution('Already refunded', 0, now, msg.sender, tx.origin);
     }
   }
 }
