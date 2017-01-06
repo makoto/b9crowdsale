@@ -5,18 +5,26 @@
     <title></title>
   </head>
   <body>
+    <h2>Project detail</h2>
     <table style="width:100%">
       <tr>
         <td>Project Name</td>
-        <td>{{project.title}} by {{project.owner.slice(0,10)}}...</td>
+        <td>"{{project.title}}" by {{project.owner}}</td>
       </tr>
       <tr>
         <td>Status</td>
-        <td class={{project.result}} >{{project.result}}</td>
+        <td class={{project.result}} >
+          {{project.result}}
+          <button id="create" ng-click="contribute(account, amount)">Update State</button>
+        </td>
       </tr>
       <tr>
         <td>Target</td>
-        <td>{{project.target_amount}} ether</td>
+        <td>{{project.target_amount}} ether ( {{ project.achivement.toString() }} % raised )</td>
+      </tr>
+      <tr>
+        <td>Deadline</td>
+        <td>{{project.deadline_for_display}}</td>
       </tr>
       <tr>
         <td>Funding amount</td>
@@ -24,59 +32,64 @@
       </tr>
     </table>
 
-    <h2>Contributors</h2>
-    <table>
-      <tr>
-        <th>
-          Amount
-        </th>
-        <th>
-          Date
-        </th>
-        <th>
-          Contributor
-        </th>
-      </tr>
-      <tr ng-repeat="contributor in contributors">
-        <td>{{ contributor.amount }}</td>
-        <td>{{ contributor.time }} ether</td>
-        <td>{{ contributor.originAddress.slice(0,10) }} ...</td>
-      </tr>
-    </table>
-
+    <div class="contributors" ng-if="project.contributors > 0">
+      </br>
+      <h2>Activities</h2>
+      <table bordercolor="#aabdeb">
+        <tr>
+          <th>
+            Amount
+          </th>
+          <th>
+            Date
+          </th>
+          <th>
+            Contributor
+          </th>
+        </tr>
+        <tr ng-repeat="contributor in contributors">
+          <td>{{ contributor.amount }} ether</td>
+          <td>{{ contributor.time }} ether</td>
+          <td>{{ contributor.originAddress }}</td>
+        </tr>
+      </table>
+    </div>
+    </br>
     <div ng-if="project.result == 'pending'">
       <h2>Contribute</h2>
       <br/><label for="amount">Amount:</label>
       <input type="text" type="number" pattern="\d+(\.)?(\d+)?" min="1" max="99999999999999999" id="amount" ng-model="amount" placeholder="In Ether e.g., 100" required></input>
-      <label>Account:
+      <div class='account'>
+        <label>Account:</label>
         <select ng-model="account"
           ng-options="account for account in accounts">
         </select>
-      </label><br/>
+      </div>
 
       <br><button id="create" ng-click="contribute(account, amount)">Contribute</button>
     </div>
 
     <div ng-if="project.result == 'failed'">
       <h2>Get refund</h2>
-      <label>Account:
+      <div class='account'>
+        <label>Account:</label>
         <select ng-model="account"
           ng-options="account for account in accounts">
         </select>
-      </label><br/>
+      </div>
 
       <br><button id="create" ng-click="refund(account)">Refund</button>
     </div>
 
     <div ng-if="project.result == 'success'">
       <h2>Withdraw fund</h2>
-      <label>Account:
+      <div class='account'>
+        <label>Account:</label>
         <select ng-model="account"
           ng-options="account for account in accounts">
         </select>
-      </label><br/>
+      </div>
       <br><button id="create" ng-click="withdrawPayments(account)">Withdraw</button> (if you are project owner)
     </div>
-
   </body>
 </html>

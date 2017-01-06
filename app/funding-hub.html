@@ -6,7 +6,7 @@
   <tr>
     <th>Status</th>
     <th>Title</th>
-    <th>Amount</th>
+    <th>Target</th>
     <th>Deadline</th>
     <th>Created by</th>
   </tr>
@@ -28,11 +28,12 @@
 <br/><label for="deadline">Deadline:</label>
 <input type="text" type="number" pattern="\d+" min="1" id="deadline" ng-model="deadline" placeholder="In seconds e.g., 60 " required></input>
 <br/>
-<label>Account:
+<div class='account'>
+  <label>Account:</label>
   <select ng-model="account"
     ng-options="account for account in accounts">
   </select>
-</label><br/>
+</div>
 
 <br><br><button id="create" ng-click="createProject(title, target_amount, deadline)">Create New Project</button>
 <br><br>
