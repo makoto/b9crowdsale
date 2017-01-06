@@ -2,7 +2,7 @@
   <span class="black">
     <span id="projects">{{ active_projects_count }}</span> active projects listed ({{ all_projects_count - active_projects_count }} finished)</span></h3>
 
-<table style="width:100%">
+<table style="width:100%" ng-if="all_projects_count > 0">
   <tr>
     <th>Status</th>
     <th>Title</th>
