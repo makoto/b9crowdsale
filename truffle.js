@@ -6,10 +6,6 @@ module.exports = {
     "app.js": [
       "javascripts/app.js"
     ],
-    "metaCoin.js": [
-      '../node_modules/angular/angular.min.js',
-      "javascripts/metaCoinController.js"
-    ],
     "external.js": [
       '../node_modules/angular/angular.min.js',
       '../node_modules/angular-route/angular-route.min.js',
