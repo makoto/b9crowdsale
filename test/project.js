@@ -198,6 +198,33 @@ contract('Project', function(accounts) {
       })
       .then(done);
     })
+
+    it('returns the contribition if trying to fund for the first time after the deadline', function(done){
+      targetAmount = contribution * 2;
+      new Tempo(web3).then(function(_tempo){
+        tempo = _tempo;
+        return Project.new(title, targetAmount, deadline, {from:owner});
+      })
+      .then(function(_project) {
+        project = _project;
+        return tempo.waitForBlocks(1, deadline + a_day);
+      })
+      .then(function() {
+        previousBalance = web3.eth.getBalance(backer);
+        return project.fund.sendTransaction({from:backer, value:contribution});
+      })
+      .then(function(){
+        assert(web3.eth.getBalance(backer).toNumber() > (previousBalance.toNumber() * 0.99)); // subtract gas fee around 0.2 %;
+        assert.strictEqual(web3.eth.getBalance(project.address).toNumber(), 0);
+        return project.detail.call()
+      })
+      .then(function(detail) {
+        assert.strictEqual(detail[4].toNumber(), 0);
+        assert.strictEqual(detail[5].toNumber(), 0);
+        assert.strictEqual(detail[6].toNumber(), results.failed);
+      })
+      .then(done);
+    })
   })
 
   describe('refund', function(){

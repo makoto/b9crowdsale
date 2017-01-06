@@ -54,6 +54,7 @@ contract Project is PullPayment, Ownable{
       if(isSuccess()){
         payout();
       }else{
+        detail.result = resultTypes.failed;
         if(contributors[tx.origin].amount != 0){
           refund();
         }
