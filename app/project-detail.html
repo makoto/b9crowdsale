@@ -83,16 +83,5 @@
 
       <br><button id="create" ng-click="refund(account)">Refund</button>
     </div>
-
-    <div ng-if="project.result == 'success'">
-      <h2>Withdraw fund</h2>
-      <div class='account'>
-        <label>Account:</label>
-        <select ng-model="account"
-          ng-options="account for account in accounts">
-        </select>
-      </div>
-      <br><button id="create" ng-click="withdrawPayments(account)">Withdraw</button> (if you are project owner)
-    </div>
   </body>
 </html>

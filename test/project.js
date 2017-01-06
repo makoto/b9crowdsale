@@ -113,11 +113,8 @@ contract('Project', function(accounts) {
         return project.fund.sendTransaction({from:backer, value:contribution});
       })
       .then(function() {
-        return project.fund.sendTransaction({from:another_backer, value:contribution});
-      })
-      .then(function() {
         previousBalance = web3.eth.getBalance(owner);
-        return project.withdrawPayments.sendTransaction({from:owner});
+        return project.fund.sendTransaction({from:another_backer, value:contribution});
       })
       .then(function(trx) {
         var gas = web3.eth.getTransactionReceipt(trx).gasUsed;
@@ -150,14 +147,11 @@ contract('Project', function(accounts) {
       })
       .then(function() {
         previousBalance = web3.eth.getBalance(another_backer);
+        previousOwnerBalance = web3.eth.getBalance(owner);
         return project.fund.sendTransaction({from:another_backer, value:contribution});
       })
       .then(function(){
-        previousOwnerBalance = web3.eth.getBalance(owner);
         assert(web3.eth.getBalance(another_backer).toNumber() + contribution - diff  > (previousBalance.toNumber() * 0.98)); // subtract gas fee around 0.2 %;
-        return project.withdrawPayments.sendTransaction({from:owner});
-      })
-      .then(function(){
         assert(web3.eth.getBalance(owner).toNumber() > (previousOwnerBalance.toNumber() + targetAmount) * 0.98);
         return project.detail.call()
       })
@@ -276,7 +270,6 @@ contract('Project', function(accounts) {
       })
       .catch(function(error){
         assert.strictEqual(error.toString(), invalid_jump_error);
-        assert.strictEqual(web3.eth.getBalance(project.address).toNumber(), contribution);
       })
       .then(done);
     })

@@ -2,7 +2,7 @@ pragma solidity ^0.4.2;
 import 'zeppelin/PullPayment.sol';
 import 'zeppelin/Ownable.sol';
 
-contract Project is PullPayment, Ownable{
+contract Project is Ownable{
   Detail public detail;
   uint public deadline;
   enum resultTypes { pending, success, failed }
@@ -99,8 +99,10 @@ contract Project is PullPayment, Ownable{
   */
   function payout() private{
     detail.result = resultTypes.success;
-    if(this.balance > 0) asyncSend(owner, this.balance);
-    EventContribution('Paid out',this.balance, now, msg.sender, owner);
+    if(this.balance > 0){
+      if(!owner.send(this.balance)) throw;
+      EventContribution('Paid out',this.balance, now, msg.sender, owner);
+    }
   }
 
   /*
