@@ -53,7 +53,7 @@ projectDetailModeule
             var obj = {
              activity: web3.toUtf8(result.args.activity),
              amount: parseFloat(web3.fromWei(result.args.amount, 'ether')),
-             time:  moment(result.args.time).fromNow(),
+             time:  moment(result.args.time * 1000).fromNow(),
              originAddress: result.args.originAddress
             }
             $scope.contributors.push(obj);
