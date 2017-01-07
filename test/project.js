@@ -59,8 +59,6 @@ contract('Project', function(accounts) {
       })
       .then(done);
     })
-    it('allows duplicate title')  // just for documentation purpose
-    it('allows empty title')      // just for documentation purpose
   })
 
   describe('fund', function(){
