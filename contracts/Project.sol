@@ -1,5 +1,4 @@
 pragma solidity ^0.4.2;
-import 'zeppelin/PullPayment.sol';
 import 'zeppelin/Ownable.sol';
 
 contract Project is Ownable{
