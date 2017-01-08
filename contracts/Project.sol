@@ -2,8 +2,14 @@ pragma solidity ^0.4.2;
 import 'zeppelin/Ownable.sol';
 
 contract Project is Ownable{
+  /* Public variables */
+
   Detail public detail;
   uint public deadline;
+  mapping(address => Contributor) public contributors;
+
+  /* Data types */
+
   enum resultTypes { pending, success, failed }
   struct Detail{
     address owner;
@@ -20,16 +26,11 @@ contract Project is Ownable{
     bool paid;
   }
 
-  mapping(address => Contributor) public contributors;
+  /* Events */
 
-  function Project(bytes32 _title, uint _targetAmount, uint _deadline) {
-    if(_deadline <= 0) throw;
-    if(_targetAmount <= 0) throw;
-    detail = Detail(tx.origin, _title, _targetAmount, now + _deadline, 0, 0, resultTypes.pending);
-  }
-
-  event EventLog(string message);
   event EventContribution(bytes32 activity, uint amount, uint time, address contributorAddress, address originAddress);
+
+  /* Modifiers */
 
   modifier notCompleted() {
     if (detail.result == resultTypes.pending) _;
@@ -40,7 +41,7 @@ contract Project is Ownable{
     _;
   }
 
-  modifier pending(){
+  modifier atPending(){
     if(detail.result != resultTypes.pending){
       if(!tx.origin.send(msg.value)) throw;
       EventContribution('Returned the value', msg.value, now, msg.sender, tx.origin);
@@ -49,7 +50,12 @@ contract Project is Ownable{
     }
   }
 
-  modifier notTimedOut(){
+  modifier atFailed(){
+    if(detail.result != resultTypes.failed) throw;
+    _;
+  }
+
+  modifier beforeDeadline(){
     if(isTimedOut()){
       detail.result = resultTypes.failed;
       if(!tx.origin.send(msg.value)) throw;
@@ -60,7 +66,15 @@ contract Project is Ownable{
     }
   }
 
-  function fund() public payable notEmpty() pending() notTimedOut(){
+  /* Public functions */
+
+  function Project(bytes32 _title, uint _targetAmount, uint _deadline) {
+    if(_deadline <= 0) throw;
+    if(_targetAmount <= 0) throw;
+    detail = Detail(tx.origin, _title, _targetAmount, now + _deadline, 0, 0, resultTypes.pending);
+  }
+
+  function fund() public payable notEmpty() atPending() beforeDeadline(){
     var amount = msg.value;
     if(this.balance > detail.targetAmount){
       var diff = this.balance - detail.targetAmount;
@@ -80,32 +94,7 @@ contract Project is Ownable{
     if(isSuccess()) payout();
   }
 
-  function isTimedOut() constant returns(bool){
-    return now > detail.deadline;
-  }
-
-  function isSuccess() constant returns(bool){
-    return detail.contributions == detail.targetAmount;
-  }
-
-  /*
-    This is the function that sends all funds received in the contract to the owner of the project.
-    Will be called by fund().
-  */
-  function payout() private{
-    detail.result = resultTypes.success;
-    if(this.balance > 0){
-      if(!owner.send(this.balance)) throw;
-      EventContribution('Paid out',this.balance, now, msg.sender, owner);
-    }
-  }
-
-  /*
-    This function sends all individual contributions back to the respective contributor,
-    or lets all contributors retrieve their contributions.
-  */
-  function refund() public{
-    if(detail.result != resultTypes.failed) throw;
+  function refund() public atFailed(){
     var contributor = contributors[tx.origin];
     if(contributor.amount == 0) throw;
 
@@ -116,5 +105,25 @@ contract Project is Ownable{
     }else{
       EventContribution('Already refunded', 0, now, msg.sender, tx.origin);
     }
+  }
+
+  /* Private functions  */
+
+  function payout() private{
+    detail.result = resultTypes.success;
+    if(this.balance > 0){
+      if(!owner.send(this.balance)) throw;
+      EventContribution('Paid out',this.balance, now, msg.sender, owner);
+    }
+  }
+
+  /* Constants */
+
+  function isTimedOut() constant returns(bool){
+    return now > detail.deadline;
+  }
+
+  function isSuccess() constant returns(bool){
+    return detail.contributions == detail.targetAmount;
   }
 }
