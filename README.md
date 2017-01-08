@@ -21,4 +21,8 @@ truffle serve
 open http://localhost:8080/
 ```
 
-- Make payout function private = There is no need to call this function manually as it gets called by `fund` function as soon as the funding goal has been met.
+## Notes
+
+- `payout` function is set to private = There is no need to call this function manually as it gets called by `fund` function as soon as the funding goal has been met.
+- `refund` function cannot be called unless project result is transitioned to `failed`. If status is `pending` even after the deadline is passed, call `fund` function to transition manually with any amount (the amount will be returned).
+- `refund` function is called when someone tries to fund after deadline only if the person has funded before = we do not automatically refund to everybody when the project failed. Other contributors have to call `refund` manually.

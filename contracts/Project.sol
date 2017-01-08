@@ -35,49 +35,49 @@ contract Project is Ownable{
     if (detail.result == resultTypes.pending) _;
   }
 
-  function transitionState() public{
-    if(isFailure()){
-      detail.result = resultTypes.failed;
-    }else if(isSuccess()){
-      detail.result = resultTypes.success;
+  modifier notEmpty(){
+    if(msg.value <= 0) throw;
+    _;
+  }
+
+  modifier pending(){
+    if(detail.result != resultTypes.pending){
+      if(!tx.origin.send(msg.value)) throw;
+      EventContribution('Returned the value', msg.value, now, msg.sender, tx.origin);
+    }else{
+      _;
     }
   }
 
-  function fund() public payable{
-    if(msg.value <= 0) throw;
-    var amount = msg.value;
-
+  modifier notTimedOut(){
     if(isTimedOut()){
-      if(!tx.origin.send(amount)) throw;
-      EventContribution('Returned the value', amount, now, msg.sender, tx.origin);
-      detail.contributions = this.balance;
-      if(isSuccess()){
-        payout();
-      }else{
-        detail.result = resultTypes.failed;
-        if(contributors[tx.origin].amount != 0){
-          refund();
-        }
-      }
+      detail.result = resultTypes.failed;
+      if(!tx.origin.send(msg.value)) throw;
+      EventContribution('Returned the value', msg.value, now, msg.sender, tx.origin);
+      if(contributors[tx.origin].amount != 0) refund();
     }else{
-      if(this.balance > detail.targetAmount){
-        var diff = this.balance - detail.targetAmount;
-        amount = amount - diff;
-        if(!tx.origin.send(diff)) throw;
-        EventContribution('Returned the diff', diff, now, msg.sender, tx.origin);
-      }
-      if(contributors[tx.origin].amount != 0){
-        contributors[tx.origin].amount += contributors[tx.origin].amount;
-      }else{
-        detail.contributors=detail.contributors+1;
-        contributors[tx.origin] = Contributor(msg.value, false);
-      }
-      detail.contributions = this.balance;
-      if(isSuccess()){
-        payout();
-      }
+      _;
+    }
+  }
+
+  function fund() public payable notEmpty() pending() notTimedOut(){
+    var amount = msg.value;
+    if(this.balance > detail.targetAmount){
+      var diff = this.balance - detail.targetAmount;
+      amount = amount - diff;
+      if(!tx.origin.send(diff)) throw;
+      EventContribution('Returned the diff', diff, now, msg.sender, tx.origin);
+    }
+    detail.contributions = this.balance;
+
+    if(contributors[tx.origin].amount != 0){
+      contributors[tx.origin].amount += amount;
+    }else{
+      detail.contributors=detail.contributors+1;
+      contributors[tx.origin] = Contributor(amount, false);
     }
     EventContribution('Contributed', amount, now, msg.sender, tx.origin);
+    if(isSuccess()) payout();
   }
 
   function isTimedOut() constant returns(bool){
@@ -86,10 +86,6 @@ contract Project is Ownable{
 
   function isSuccess() constant returns(bool){
     return detail.contributions == detail.targetAmount;
-  }
-
-  function isFailure() constant returns(bool){
-    return isTimedOut() && (detail.contributions < detail.targetAmount);
   }
 
   /*
@@ -109,9 +105,7 @@ contract Project is Ownable{
     or lets all contributors retrieve their contributions.
   */
   function refund() public{
-    if(!isFailure()) throw;
-    detail.result = resultTypes.failed;
-
+    if(detail.result != resultTypes.failed) throw;
     var contributor = contributors[tx.origin];
     if(contributor.amount == 0) throw;
 
