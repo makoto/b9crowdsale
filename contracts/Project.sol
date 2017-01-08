@@ -1,9 +1,9 @@
 pragma solidity ^0.4.2;
-import 'zeppelin/Ownable.sol';
 
-contract Project is Ownable{
+contract Project{
   /* Public variables */
 
+  address public owner;
   Detail public detail;
   uint public deadline;
   mapping(address => Contributor) public contributors;
@@ -69,6 +69,7 @@ contract Project is Ownable{
   /* Public functions */
 
   function Project(bytes32 _title, uint _targetAmount, uint _deadline) {
+    owner = tx.origin;
     if(_deadline <= 0) throw;
     if(_targetAmount <= 0) throw;
     detail = Detail(tx.origin, _title, _targetAmount, now + _deadline, 0, 0, resultTypes.pending);
@@ -113,7 +114,7 @@ contract Project is Ownable{
     detail.result = resultTypes.success;
     if(this.balance > 0){
       if(!owner.send(this.balance)) throw;
-      EventContribution('Paid out',this.balance, now, msg.sender, owner);
+      EventContribution('Paid out', detail.contributions, now, msg.sender, owner);
     }
   }
 
