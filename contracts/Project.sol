@@ -41,10 +41,10 @@ contract Project{
     _;
   }
 
-  modifier atPending(){
+  modifier atPending(address sender){
     if(detail.result != resultTypes.pending){
-      if(!tx.origin.send(msg.value)) throw;
-      EventContribution('Returned the value', msg.value, now, msg.sender, tx.origin);
+      if(!sender.send(msg.value)) throw;
+      EventContribution('Returned the value', msg.value, now, msg.sender, sender);
     }else{
       _;
     }
@@ -55,12 +55,12 @@ contract Project{
     _;
   }
 
-  modifier beforeDeadline(){
+  modifier beforeDeadline(address sender){
     if(isTimedOut()){
       detail.result = resultTypes.failed;
-      if(!tx.origin.send(msg.value)) throw;
-      EventContribution('Returned the value', msg.value, now, msg.sender, tx.origin);
-      if(contributors[tx.origin].amount != 0) refund();
+      if(!sender.send(msg.value)) throw;
+      EventContribution('Returned the value', msg.value, now, msg.sender, sender);
+      if(contributors[sender].amount != 0) refund(sender);
     }else{
       _;
     }
@@ -68,43 +68,43 @@ contract Project{
 
   /* Public functions */
 
-  function Project(bytes32 _title, uint _targetAmount, uint _deadline) {
-    owner = tx.origin;
+  function Project(address _owner, bytes32 _title, uint _targetAmount, uint _deadline) {
+    owner = _owner;
     if(_deadline <= 0) throw;
     if(_targetAmount <= 0) throw;
-    detail = Detail(tx.origin, _title, _targetAmount, now + _deadline, 0, 0, resultTypes.pending);
+    detail = Detail(owner, _title, _targetAmount, now + _deadline, 0, 0, resultTypes.pending);
   }
 
-  function fund() public payable notEmpty() atPending() beforeDeadline(){
+  function fund(address sender) public payable notEmpty() atPending(sender) beforeDeadline(sender){
     var amount = msg.value;
     if(this.balance > detail.targetAmount){
       var diff = this.balance - detail.targetAmount;
       amount = amount - diff;
-      if(!tx.origin.send(diff)) throw;
-      EventContribution('Returned the diff', diff, now, msg.sender, tx.origin);
+      if(!sender.send(diff)) throw;
+      EventContribution('Returned the diff', diff, now, msg.sender, sender);
     }
     detail.contributions = this.balance;
 
-    if(contributors[tx.origin].amount != 0){
-      contributors[tx.origin].amount += amount;
+    if(contributors[sender].amount != 0){
+      contributors[sender].amount += amount;
     }else{
       detail.contributors=detail.contributors+1;
-      contributors[tx.origin] = Contributor(amount, false);
+      contributors[sender] = Contributor(amount, false);
     }
-    EventContribution('Contributed', amount, now, msg.sender, tx.origin);
+    EventContribution('Contributed', amount, now, msg.sender, sender);
     if(isSuccess()) payout();
   }
 
-  function refund() public atFailed(){
-    var contributor = contributors[tx.origin];
+  function refund(address sender) public atFailed(){
+    var contributor = contributors[sender];
     if(contributor.amount == 0) throw;
 
     if (contributor.paid == false){
       contributor.paid = true;
-      if(!tx.origin.send(contributor.amount)) throw;
-      EventContribution('Refunded', contributor.amount, now, msg.sender, tx.origin);
+      if(!sender.send(contributor.amount)) throw;
+      EventContribution('Refunded', contributor.amount, now, msg.sender, sender);
     }else{
-      EventContribution('Already refunded', 0, now, msg.sender, tx.origin);
+      EventContribution('Already refunded', 0, now, msg.sender, sender);
     }
   }
 

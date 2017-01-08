@@ -28,7 +28,7 @@ contract('Project', function(accounts) {
   describe('constructor', function(){
     it('creates new project', function(done){
       var date = new Date();
-      Project.new(title, targetAmount, deadline, {from:owner})
+      Project.new(owner, title, targetAmount, deadline)
       .then(function(_project) {
         project = _project;
         return project.detail.call()
@@ -46,7 +46,7 @@ contract('Project', function(accounts) {
     })
 
     it('does not allow zero deadline', function(done){
-      Project.new(title, targetAmount, 0, {from:owner})
+      Project.new(owner, title, targetAmount, 0)
       .catch(function(error){
         assert.strictEqual(error.toString(), invalid_jump_error);
       })
@@ -54,7 +54,7 @@ contract('Project', function(accounts) {
     })
 
     it('does not allow empty or minus target', function(done){
-      Project.new(title, 0, deadline, {from:owner})
+      Project.new(owner, title, 0, deadline)
       .catch(function(error){
         assert.strictEqual(error.toString(), invalid_jump_error);
       })
@@ -64,13 +64,13 @@ contract('Project', function(accounts) {
 
   describe('fund', function(){
     it('keeps track of contributor and contribution amount', function(done){
-      Project.new(title, targetAmount, deadline, {from:owner})
+      Project.new(owner, title, targetAmount, deadline)
       .then(function(_project) {
         project = _project;
-        return project.fund.sendTransaction({from:backer, value:contribution});
+        return project.fund.sendTransaction(backer, {value:contribution});
       })
       .then(function() {
-        return project.fund.sendTransaction({from:backer, value:contribution});
+        return project.fund.sendTransaction(backer, {value:contribution});
       })
       .then(function() {
         assert.strictEqual(web3.eth.getBalance(project.address).toString(), (contribution * 2).toString());
@@ -90,10 +90,10 @@ contract('Project', function(accounts) {
     })
 
     it('does not allow zero contribution', function(done){
-      Project.new(title, targetAmount, deadline, {from:owner})
+      Project.new(owner, title, targetAmount, deadline)
       .then(function(_project) {
         project = _project;
-        return project.fund.sendTransaction({from:backer, value:0});
+        return project.fund.sendTransaction(backer, {value:0});
       })
       .catch(function(error){
         assert.strictEqual(error.toString(), invalid_jump_error);
@@ -105,15 +105,15 @@ contract('Project', function(accounts) {
       targetAmount = contribution * 2;
       new Tempo(web3).then(function(_tempo){
         tempo = _tempo;
-        return Project.new(title, targetAmount, deadline, {from:owner});
+        return Project.new(owner, title, targetAmount, deadline);
       })
       .then(function(_project) {
         project = _project;
-        return project.fund.sendTransaction({from:backer, value:contribution});
+        return project.fund.sendTransaction(backer, {value:contribution});
       })
       .then(function() {
         previousBalance = web3.eth.getBalance(owner);
-        return project.fund.sendTransaction({from:another_backer, value:contribution});
+        return project.fund.sendTransaction(another_backer, {value:contribution});
       })
       .then(function(trx) {
         var gas = web3.eth.getTransactionReceipt(trx).gasUsed;
@@ -138,16 +138,16 @@ contract('Project', function(accounts) {
       var diff = targetAmount - parseInt(contribution);
       new Tempo(web3).then(function(_tempo){
         tempo = _tempo;
-        return Project.new(title, targetAmount, deadline, {from:owner});
+        return Project.new(owner, title, targetAmount, deadline);
       })
       .then(function(_project) {
         project = _project;
-        return project.fund.sendTransaction({from:backer, value:contribution});
+        return project.fund.sendTransaction(backer, {value:contribution});
       })
       .then(function() {
         previousBalance = web3.eth.getBalance(another_backer);
         previousOwnerBalance = web3.eth.getBalance(owner);
-        return project.fund.sendTransaction({from:another_backer, value:contribution});
+        return project.fund.sendTransaction(another_backer, {value:contribution});
       })
       .then(function(){
         assert(web3.eth.getBalance(another_backer).toNumber() + contribution - diff  > (previousBalance.toNumber() * 0.98)); // subtract gas fee around 0.2 %;
@@ -166,18 +166,18 @@ contract('Project', function(accounts) {
       targetAmount = contribution * 2;
       new Tempo(web3).then(function(_tempo){
         tempo = _tempo;
-        return Project.new(title, targetAmount, deadline, {from:owner});
+        return Project.new(owner, title, targetAmount, deadline);
       })
       .then(function(_project) {
         project = _project;
         previousBalance = web3.eth.getBalance(backer);
-        return project.fund.sendTransaction({from:backer, value:contribution});
+        return project.fund.sendTransaction(backer, {value:contribution});
       })
       .then(function() {
         return tempo.waitForBlocks(1, deadline + a_day);
       })
       .then(function() {
-        return project.fund.sendTransaction({from:backer, value:contribution});
+        return project.fund.sendTransaction(backer, {value:contribution});
       })
       .then(function(){
         assert(web3.eth.getBalance(backer).toNumber() > (previousBalance.toNumber() * 0.99)); // subtract gas fee around 0.2 %;
@@ -196,7 +196,7 @@ contract('Project', function(accounts) {
       targetAmount = contribution * 2;
       new Tempo(web3).then(function(_tempo){
         tempo = _tempo;
-        return Project.new(title, targetAmount, deadline, {from:owner});
+        return Project.new(owner, title, targetAmount, deadline);
       })
       .then(function(_project) {
         project = _project;
@@ -204,7 +204,7 @@ contract('Project', function(accounts) {
       })
       .then(function() {
         previousBalance = web3.eth.getBalance(backer);
-        return project.fund.sendTransaction({from:backer, value:contribution});
+        return project.fund.sendTransaction(backer, {value:contribution});
       })
       .then(function(){
         assert(web3.eth.getBalance(backer).toNumber() > (previousBalance.toNumber() * 0.99)); // subtract gas fee around 0.2 %;
@@ -225,21 +225,21 @@ contract('Project', function(accounts) {
       targetAmount = contribution * 2;
       new Tempo(web3).then(function(_tempo){
         tempo = _tempo;
-        return Project.new(title, targetAmount, deadline, {from:owner});
+        return Project.new(owner, title, targetAmount, deadline);
       })
       .then(function(_project) {
         project = _project;
-        return project.fund.sendTransaction({from:backer, value:contribution});
+        return project.fund.sendTransaction(backer, {value:contribution});
       })
       .then(function() {
         return tempo.waitForBlocks(1, deadline + a_day);
       })
       .then(function(_project) {
-        return project.fund.sendTransaction({from:another_backer, value:1});
+        return project.fund.sendTransaction(another_backer, {value:1});
       })
       .then(function() {
         previousBalance = web3.eth.getBalance(backer);
-        return project.refund.sendTransaction({from:backer});
+        return project.refund.sendTransaction(backer);
       })
       .then(function() {
         assert.strictEqual(web3.eth.getBalance(project.address).toString(), '0');
@@ -258,11 +258,11 @@ contract('Project', function(accounts) {
       targetAmount = contribution * 1;
       new Tempo(web3).then(function(_tempo){
         tempo = _tempo;
-        return Project.new(title, targetAmount, deadline, {from:owner});
+        return Project.new(owner, title, targetAmount, deadline);
       })
       .then(function(_project) {
         project = _project;
-        return project.fund.sendTransaction({from:backer, value:contribution});
+        return project.fund.sendTransaction(backer, {value:contribution});
       })
       .then(function() {
         return project.detail.call()
@@ -274,7 +274,7 @@ contract('Project', function(accounts) {
         return tempo.waitForBlocks(1, deadline + a_day);
       })
       .then(function() {
-        return project.refund.sendTransaction({from:backer});
+        return project.refund.sendTransaction(backer);
       })
       .catch(function(error){
         assert.strictEqual(error.toString(), invalid_jump_error);
@@ -286,27 +286,27 @@ contract('Project', function(accounts) {
       targetAmount = contribution * 3;
       new Tempo(web3).then(function(_tempo){
         tempo = _tempo;
-        return Project.new(title, targetAmount, deadline, {from:owner});
+        return Project.new(owner, title, targetAmount, deadline);
       })
       .then(function(_project) {
         project = _project;
-        return project.fund.sendTransaction({from:backer, value:contribution});
+        return project.fund.sendTransaction(backer, {value:contribution});
       })
       .then(function(_project) {
-        return project.fund.sendTransaction({from:another_backer, value:contribution});
+        return project.fund.sendTransaction(another_backer, {value:contribution});
       })
       .then(function() {
         return tempo.waitForBlocks(1, deadline + a_day);
       })
       .then(function(_project) {
-        return project.fund.sendTransaction({from:another_backer_two, value:1});
+        return project.fund.sendTransaction(another_backer_two, {value:1});
       })
       .then(function() {
         previousBalance = web3.eth.getBalance(backer);
-        return project.refund.sendTransaction({from:backer});
+        return project.refund.sendTransaction(backer);
       })
       .then(function() {
-        return project.refund.sendTransaction({from:backer});
+        return project.refund.sendTransaction(backer);
       })
       .then(function(){
         assert(web3.eth.getBalance(backer).toNumber() > previousBalance.toNumber());
@@ -317,28 +317,19 @@ contract('Project', function(accounts) {
     it("does not refund the fund to the contributor if deadline is not passed", function(done){
       new Tempo(web3).then(function(_tempo){
         tempo = _tempo;
-        return Project.new(title, targetAmount, deadline, {from:owner})
+        return Project.new(owner, title, targetAmount, deadline);
       })
       .then(function(_project) {
         project = _project;
-        return project.fund.sendTransaction({from:backer, value:contribution});
+        return project.fund.sendTransaction(backer, {value:contribution});
       })
       .then(function() {
         previousBalance = web3.eth.getBalance(backer);
-        return project.refund.sendTransaction({from:backer});
-      })
-      .then(function() {
-        return tempo.waitForBlocks(1, deadline - a_day)
-      })
-      .then(function(_project) {
-        return project.fund.sendTransaction({from:another_backer_two, value:1});
-      })
-      .then(function() {
-        return project.refund.sendTransaction({from:backer});
+        return project.refund.sendTransaction(backer);
       })
       .catch(function(error){
         assert.strictEqual(error.toString(), invalid_jump_error);
-        assert(web3.eth.getBalance(backer).toNumber() < previousBalance.toNumber());
+        assert.strictEqual(web3.eth.getBalance(backer).toNumber(),  previousBalance.toNumber());
         assert.strictEqual(web3.eth.getBalance(project.address).toNumber(), contribution);
       })
       .then(done);

@@ -22,15 +22,8 @@ projectDetailModeule
       }
 
       $scope.refund = function(account){
-        var project = Project.at($scope.project_id);
-        project.refund.sendTransaction({from: account, gas:1000000}).then(function() {
-          $scope.refreshProjects();
-        }).catch(function(e) {});
-      }
-
-      $scope.withdrawPayments = function(account){
-        var project = Project.at($scope.project_id);
-        project.withdrawPayments.sendTransaction({from: account, gas:1000000}).then(function() {
+        var hub = FundingHub.deployed();
+        hub.refund.sendTransaction({from:account, gas:1000000}).then(function() {
           $scope.refreshProjects();
         }).catch(function(e) {});
       }
