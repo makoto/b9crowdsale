@@ -36,7 +36,12 @@ contract Project{
     if (detail.result == resultTypes.pending) _;
   }
 
-  modifier notEmpty(){
+  modifier withAddress(address _address){
+    if(_address == 0) throw;
+    _;
+  }
+
+  modifier withValue(){
     if(msg.value <= 0) throw;
     _;
   }
@@ -68,14 +73,14 @@ contract Project{
 
   /* Public functions */
 
-  function Project(address _owner, bytes32 _title, uint _targetAmount, uint _deadline) {
+  function Project(address _owner, bytes32 _title, uint _targetAmount, uint _deadline) withAddress(_owner) {
     owner = _owner;
     if(_deadline <= 0) throw;
     if(_targetAmount <= 0) throw;
     detail = Detail(owner, _title, _targetAmount, now + _deadline, 0, 0, resultTypes.pending);
   }
 
-  function fund(address sender) public payable notEmpty() atPending(sender) beforeDeadline(sender){
+  function fund(address sender) public payable withAddress(sender) withValue() atPending(sender) beforeDeadline(sender){
     var amount = msg.value;
     if(this.balance > detail.targetAmount){
       var diff = this.balance - detail.targetAmount;
@@ -95,7 +100,7 @@ contract Project{
     if(isSuccess()) payout();
   }
 
-  function refund(address sender) public atFailed(){
+  function refund(address sender) public withAddress(sender) atFailed(){
     var contributor = contributors[sender];
     if(contributor.amount == 0) throw;
 
