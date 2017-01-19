@@ -23,7 +23,7 @@ projectDetailModeule
 
       $scope.refund = function(account){
         var hub = FundingHub.deployed();
-        hub.refund.sendTransaction({from:account, gas:1000000}).then(function() {
+        hub.refund.sendTransaction($scope.project_id, {from:account, gas:1000000}).then(function() {
           $scope.refreshProjects();
         }).catch(function(e) {});
       }
