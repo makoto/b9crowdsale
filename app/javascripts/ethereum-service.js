@@ -9,6 +9,9 @@ ethereumModule.factory('EthereumFactory', function($q){
 
   factory.refreshProjects = function() {
     return new Promise(function(resolve, reject){
+      if (web3.version.network < 10) {
+        FundingHub.setNetwork(web3.version.network);
+      }
       var hub = FundingHub.deployed();
       var projects = [];
       var project_addresses = [];
