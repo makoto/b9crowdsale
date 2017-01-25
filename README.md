@@ -15,7 +15,7 @@ https://github.com/makoto/b9crowdsale
 ```
 git clone https://github.com/makoto/b9crowdsale
 npm install
-truffle migrate
+truffle migrate --network development|testnet|mainnet
 truffle serve
 open http://localhost:8080/
 ```
@@ -26,14 +26,17 @@ The demo video walk through of the following scenarios is on [youtube](https://y
 
 ### Funding succeeded
 
+```
 Given User 1 created a project with funding goal of 10 Ether
   And User 2 funded 5 Ether
 When User 3 press 'contribute' with 10 Ether
 Then User 3 receives 5 Ether back
   And User 1 receives 10 Ether
+```
 
 ### Funding failed
 
+```
 Given User 1 created a project with funding goal of 10 Ether
   And User 2 funded 5 Ether
   And User 3 funded 2 Ether
@@ -45,6 +48,7 @@ When User 2 press 'refund'
 Then User 2 receives 5 Ether
 When User 2 press 'refund'
 Then User 2 receives 0 Ether
+```
 
 ## Notes
 
