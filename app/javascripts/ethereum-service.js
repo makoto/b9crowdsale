@@ -62,7 +62,6 @@ ethereumModule.factory('EthereumFactory', function($q){
 
   factory.getAccounts = function(){
     return new Promise(function(resolve, reject){
-      debugger;
       web3.eth.getAccounts(function(err, accs) {
         if (err) {
           reject(err);
