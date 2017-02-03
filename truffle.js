@@ -24,19 +24,21 @@ module.exports = {
     ],
     "images/": "images/"
   },
-  rpc: {
-    host: "localhost",
-    port: 8545
-  },
   networks: {
-    "mainnet": {
-      network_id: 1 // Ethereum public network
+    development: {
+      host: "localhost",
+      port: 8545,
+      network_id: "*"
     },
-    "testnet":   {
-      network_id: 3        // Official Ethereum test network
+    testnet: {
+      host: "localhost",
+      port: 8545,
+      network_id: 3
     },
-    "development": {
-      network_id: "default"
+    mainnet: {
+      host: "localhost",
+      port: 8545,
+      network_id: 1
     }
   }
 };
