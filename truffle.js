@@ -1,5 +1,7 @@
+var DefaultBuilder = require('truffle-default-builder');
+
 module.exports = {
-  build: {
+  build: new DefaultBuilder({
     "index.html": "index.html",
     "funding-hub.html": "funding-hub.html",
     "project-detail.html": "project-detail.html",
@@ -21,22 +23,23 @@ module.exports = {
     ],
     "app.css": [
       "stylesheets/app.css"
-    ],
-    "images/": "images/"
-  },
-  rpc: {
-    host: "localhost",
-    port: 8545
-  },
+    ]
+  }),
   networks: {
-    "mainnet": {
-      network_id: 1 // Ethereum public network
+    development: {
+      host: "localhost",
+      port: 8545,
+      network_id: "*"
     },
-    "testnet":   {
-      network_id: 3        // Official Ethereum test network
+    testnet: {
+      host: "localhost",
+      port: 8545,
+      network_id: 3
     },
-    "development": {
-      network_id: "default"
+    mainnet: {
+      host: "localhost",
+      port: 8545,
+      network_id: 1
     }
   }
 };

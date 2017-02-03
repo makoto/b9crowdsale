@@ -14,28 +14,47 @@ projectDetailModeule
       };
 
       $scope.contribute = function(account, amount){
-        var hub = FundingHub.deployed();
-        console.log('account', $scope.account);
-        hub.contribute.sendTransaction($scope.project_id, {value:web3.toWei(amount), from: account, gas:1000000}).then(function() {
-          $scope.refreshProjects();
-        }).catch(function(e) {});
+        var hub;
+        FundingHub.deployed()
+          .then(function(instance) {
+            hub = instance;
+            return hub.contribute.sendTransaction($scope.project_id, {value:web3.toWei(amount), from: account, gas:1000000})
+          })
+          .then(function() {
+            $scope.refreshProjects();
+          }).catch(function(e) {});
       }
 
       $scope.refund = function(account){
-        var hub = FundingHub.deployed();
-        hub.refund.sendTransaction($scope.project_id, {from:account, gas:1000000}).then(function() {
-          $scope.refreshProjects();
-        }).catch(function(e) {});
+        var hub;
+        FundingHub.deployed()
+          .then(function(instance) {
+            hub = instance;
+            return hub.refund.sendTransaction($scope.project_id, {from:account, gas:1000000})
+          })
+          .then(function() {
+            $scope.refreshProjects();
+          }).catch(function(e) {});
       }
 
-      EthereumService.getAccounts()
-        .then(function(accounts){
-          $timeout(function () {
-            $scope.accounts = accounts;
-            $scope.account = $scope.accounts[0];
-            $scope.refreshProjects();
-          });
-        })
+      $scope.getAccounts = function() {
+        EthereumService.getAccounts()
+          .then(function(accounts){
+            $timeout(function () {
+              $scope.accounts = accounts;
+              $scope.account = $scope.accounts[0];
+              $scope.refreshProjects();
+            });
+          })
+      }
+
+      if (typeof(web3) == "undefined") {
+        $window.onload = function () {
+          $scope.getAccounts()
+        }
+      }else{
+        $scope.getAccounts()
+      }
 
       var event = Project.at($scope.project_id).allEvents({fromBlock:0})
       $scope.activities = [];

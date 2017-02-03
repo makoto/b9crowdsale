@@ -10,7 +10,7 @@ We have {{ active_projects_count }} active projects listed ({{ all_projects_coun
   </tr>
   <tr ng-repeat="project in projects">
     <td class={{project.result}}>{{ project.result }}</td>
-    <td><a ng-href='#project/{{ project.project_id }}'>{{ project.title }}</a></td>
+    <td><a ng-href='#!/project/{{ project.project_id }}'>{{ project.title }}</a></td>
     <td>{{ project.target_amount }} ether ( {{ project.achivement.toString() }} % raised )</td>
     <td>{{ project.deadline_for_display }}</td>
     <td>{{ project.owner.slice(0,10) }} ...</td>

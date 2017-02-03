@@ -7,8 +7,8 @@ https://github.com/makoto/b9crowdsale
 ## Prerequisite
 
 - node
-- testrpc (start it from its own terminal)
-- truffle
+- testrpc (v3)
+- truffle (v3)
 
 ## How to run the app.
 

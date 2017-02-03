@@ -19,22 +19,36 @@ hundingHubModule
           })
       };
 
-      EthereumService.getAccounts()
-        .then(function(accounts){
-          $timeout(function () {
-            $scope.accounts = accounts;
-            $scope.account = $scope.accounts[0];
-            $scope.refreshProjects();
-          });
-        })
+      $scope.getAccounts = function() {
+        EthereumService.getAccounts()
+          .then(function(accounts){
+            $timeout(function () {
+              $scope.accounts = accounts;
+              $scope.account = $scope.accounts[0];
+              $scope.refreshProjects();
+            });
+          })
+      }
 
       $scope.createProject = function(title, target_amount, deadline) {
-        var hub = FundingHub.deployed();
-
-         hub.createProject.sendTransaction(web3.fromUtf8(title), web3.toWei(target_amount), deadline, {from: $scope.account, gas:1000000}).then(function() {
+        var hub;
+        FundingHub.deployed()
+          .then(function(instance) {
+            hub = instance;
+            return hub.createProject.sendTransaction(web3.fromUtf8(title), web3.toWei(target_amount), deadline, {from: $scope.account, gas:1000000})
+          })
+          .then(function() {
            $scope.refreshProjects();
-         }).catch(function(e) {
-         });
+          }).catch(function(e) {
+          });
+      }
+
+      if (typeof(web3) == "undefined") {
+        $window.onload = function () {
+          $scope.getAccounts()
+        }
+      }else{
+        $scope.getAccounts()
       }
     }
 })
