@@ -37,14 +37,24 @@ projectDetailModeule
           }).catch(function(e) {});
       }
 
-      EthereumService.getAccounts()
-        .then(function(accounts){
-          $timeout(function () {
-            $scope.accounts = accounts;
-            $scope.account = $scope.accounts[0];
-            $scope.refreshProjects();
-          });
-        })
+      $scope.getAccounts = function() {
+        EthereumService.getAccounts()
+          .then(function(accounts){
+            $timeout(function () {
+              $scope.accounts = accounts;
+              $scope.account = $scope.accounts[0];
+              $scope.refreshProjects();
+            });
+          })
+      }
+
+      if (typeof(web3) == "undefined") {
+        $window.onload = function () {
+          $scope.getAccounts()
+        }
+      }else{
+        $scope.getAccounts()
+      }
 
       var event = Project.at($scope.project_id).allEvents({fromBlock:0})
       $scope.activities = [];
