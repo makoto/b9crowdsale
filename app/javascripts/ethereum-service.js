@@ -1,8 +1,3 @@
-var contract = require("truffle-contract");
-var json = require("./build/contracts/FundingHub.json");
-
-var FundingHub = contract(json);
-
 var ethereumModule = angular.module('ethereumModule', []);
 
 function getStatus(number){
