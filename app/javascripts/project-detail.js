@@ -14,18 +14,27 @@ projectDetailModeule
       };
 
       $scope.contribute = function(account, amount){
-        var hub = FundingHub.deployed();
-        console.log('account', $scope.account);
-        hub.contribute.sendTransaction($scope.project_id, {value:web3.toWei(amount), from: account, gas:1000000}).then(function() {
-          $scope.refreshProjects();
-        }).catch(function(e) {});
+        var hub;
+        FundingHub.deployed()
+          .then(function(instance) {
+            hub = instance;
+            return hub.contribute.sendTransaction($scope.project_id, {value:web3.toWei(amount), from: account, gas:1000000})
+          })
+          .then(function() {
+            $scope.refreshProjects();
+          }).catch(function(e) {});
       }
 
       $scope.refund = function(account){
-        var hub = FundingHub.deployed();
-        hub.refund.sendTransaction($scope.project_id, {from:account, gas:1000000}).then(function() {
-          $scope.refreshProjects();
-        }).catch(function(e) {});
+        var hub;
+        FundingHub.deployed()
+          .then(function(instance) {
+            hub = instance;
+            return hub.refund.sendTransaction($scope.project_id, {from:account, gas:1000000})
+          })
+          .then(function() {
+            $scope.refreshProjects();
+          }).catch(function(e) {});
       }
 
       EthereumService.getAccounts()
@@ -39,6 +48,7 @@ projectDetailModeule
 
       var event = Project.at($scope.project_id).allEvents({fromBlock:0})
       $scope.activities = [];
+      debugger;
       event.watch(function(err,result) {
         if (result.event == 'EventContribution') {
           $timeout(function () {

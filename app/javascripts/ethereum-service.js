@@ -12,10 +12,14 @@ ethereumModule.factory('EthereumFactory', function($q){
       if (web3.version.network < 10) {
         FundingHub.setNetwork(web3.version.network);
       }
-      var hub = FundingHub.deployed();
       var projects = [];
       var project_addresses = [];
-      hub.numOfProjects.call()
+      var hub;
+      FundingHub.deployed()
+        .then(function(instance) {
+          hub = instance;
+          return hub.numOfProjects.call()
+        })
         .then(function(value) {
           var allRequests = []; // Or {}
           for (index = 0; index < value; index++) {
@@ -58,6 +62,7 @@ ethereumModule.factory('EthereumFactory', function($q){
 
   factory.getAccounts = function(){
     return new Promise(function(resolve, reject){
+      debugger;
       web3.eth.getAccounts(function(err, accs) {
         if (err) {
           reject(err);
