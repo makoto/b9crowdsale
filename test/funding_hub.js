@@ -1,4 +1,5 @@
 'use strict';
+var FundingHub = artifacts.require("FundingHub.sol");
 
 contract('FundingHub', function(accounts) {
   var hub;

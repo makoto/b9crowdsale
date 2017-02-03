@@ -1,7 +1,8 @@
 'use strict';
+var Project = artifacts.require("Project.sol");
+var Tempo = require('@digix/tempo').default
 
 contract('Project', function(accounts) {
-  var Tempo = require('@digix/tempo').default
   var tempo, project;
   var owner = accounts[0];
   var backer = accounts[1];
