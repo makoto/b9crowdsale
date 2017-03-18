@@ -15,8 +15,8 @@ https://github.com/makoto/b9crowdsale
 ```
 git clone https://github.com/makoto/b9crowdsale
 npm install
-truffle migrate --network development|testnet|mainnet
-truffle serve
+./node_modules/.bin/truffle migrate --network development|testnet|mainnet
+./node_modules/.bin/truffle serve
 open http://localhost:8080/
 ```
 
