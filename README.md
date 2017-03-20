@@ -12,13 +12,29 @@ https://github.com/makoto/b9crowdsale
 
 ## How to run the app.
 
+### Download and setup
+
 ```
 git clone https://github.com/makoto/b9crowdsale
+cd b9crowdsale
 npm install
+```
+
+### Start testrpc in one window
+
+```
+./node_modules/.bin/testrpc
+```
+
+### Start truffle in another window
+
+
+```
 ./node_modules/.bin/truffle migrate --network development|testnet|mainnet
 ./node_modules/.bin/truffle serve
 open http://localhost:8080/
 ```
+
 
 ## Demo
 
