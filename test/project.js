@@ -11,7 +11,7 @@ contract('Project', function(accounts) {
   var title = 'My pet project';
   var a_day = 1 * 60 * 60 * 24 // 1 day
   var deadline = a_day * 8;
-  var invalid_jump_error = 'Error: VM Exception while processing transaction: invalid JUMP';
+  var invalid_jump_error = /Error: VM Exception while processing transaction: invalid JUMP/;
   var previousBalance, previousOwnerBalance;
   var TestRPC = require('ethereumjs-testrpc')
   var Web3 = require('web3')
@@ -49,7 +49,7 @@ contract('Project', function(accounts) {
     it('does not allow zero deadline', function(done){
       Project.new(owner, title, targetAmount, 0)
       .catch(function(error){
-        assert.strictEqual(error.toString(), invalid_jump_error);
+        assert.match(error.toString(), invalid_jump_error);
       })
       .then(done);
     })
@@ -57,7 +57,7 @@ contract('Project', function(accounts) {
     it('does not allow empty or minus target', function(done){
       Project.new(owner, title, 0, deadline)
       .catch(function(error){
-        assert.strictEqual(error.toString(), invalid_jump_error);
+        assert.match(error.toString(), invalid_jump_error);
       })
       .then(done);
     })
@@ -97,7 +97,7 @@ contract('Project', function(accounts) {
         return project.fund.sendTransaction(backer, {value:0});
       })
       .catch(function(error){
-        assert.strictEqual(error.toString(), invalid_jump_error);
+        assert.match(error.toString(), invalid_jump_error);
       })
       .then(done);
     })
@@ -278,7 +278,7 @@ contract('Project', function(accounts) {
         return project.refund.sendTransaction(backer);
       })
       .catch(function(error){
-        assert.strictEqual(error.toString(), invalid_jump_error);
+        assert.match(error.toString(), invalid_jump_error);
       })
       .then(done);
     })
@@ -329,7 +329,7 @@ contract('Project', function(accounts) {
         return project.refund.sendTransaction(backer);
       })
       .catch(function(error){
-        assert.strictEqual(error.toString(), invalid_jump_error);
+        assert.match(error.toString(), invalid_jump_error);
         assert.strictEqual(web3.eth.getBalance(backer).toNumber(),  previousBalance.toNumber());
         assert.strictEqual(web3.eth.getBalance(project.address).toNumber(), contribution);
       })
