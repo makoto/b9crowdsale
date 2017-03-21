@@ -7,7 +7,7 @@ app.config(function ($locationProvider, $routeProvider) {
     .when('/', {
       template: "<hunding-hub></hunding-hub>"
     })
-    .when('/project/:id', {
+    .when('/!/project/:id', {
       template: "<project-detail></project-detail>"
     })
     .otherwise({redirectTo:'/'})
